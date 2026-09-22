@@ -23,6 +23,8 @@ simulation" -- it can -- but two measured ones:
 marked `TODO(measure)` comes from the named command and its JSON, never from
 a keyboard.
 
+**Walkthrough:** https://aungkaung1928.github.io/projects/so-arm100.html — the bench and the three policy projects built on it, explained end to end.
+
 ## What is in the box
 
 ```
@@ -173,7 +175,7 @@ pip install -e .
 ```
 
 `docker build -t so-arm100-rl . && docker run --rm so-arm100-rl` runs the
-tests in a clean image (no GL; nothing here renders).
+tests in a clean image (no GL; nothing here renders). Image built on 2026-09-23 and its default command passed inside it (16 tests passed), image size 1.84 GB.
 
 ## Limits, stated
 
