@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "so-arm100-rl"
+version = "0.1.0"
+description = "PPO with a reach-push-lift curriculum and domain randomisation on the SO-ARM100 bench, evaluated on held-out physics"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.2",
+    "numpy>=1.26",
+    "so-arm100-sim>=0.1.0",
+]
+
+[project.optional-dependencies]
+export = ["onnx", "onnxruntime"]
+dev = ["pytest>=8"]
+
+[tool.setuptools]
+packages = ["so_arm100_rl"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

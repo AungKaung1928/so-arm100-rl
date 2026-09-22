@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+
+# training outputs: keep the measured JSON, drop checkpoints, logs and graphs
+runs/*
+!runs/*.json
+runs/*/

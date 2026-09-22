@@ -1,0 +1,12 @@
+# CPU-only torch. Install it FIRST from the CPU index, or pip resolves the CUDA build:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+# Versions are the ones every number in the README was measured on.
+torch==2.11.0
+numpy>=1.26,<3
+mujoco==3.13.0
+onnx==1.23.0
+onnxruntime==1.30.0
+pytest
+
+# The bench, pinned to a tag. Update the tag deliberately, never to "main".
+so-arm100-sim @ git+https://github.com/AungKaung1928/so-arm100-sim.git@v0.1.0

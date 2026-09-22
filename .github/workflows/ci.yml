@@ -1,0 +1,25 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      OMP_NUM_THREADS: "1"
+      MUJOCO_GL: disable
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: install (CPU torch first, then the bench from its tag)
+        run: |
+          pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements.txt
+          pip install -e .
+      - name: tests
+        run: python -m pytest tests
