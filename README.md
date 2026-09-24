@@ -23,8 +23,9 @@ simulation" -- it can -- but two measured ones:
 scratch reaches lift ≥ 0.6 at 1.0 M steps; DR from scratch stalled (rolling
 success ≤ 0.09 through 4.9 M) and was stopped; a DR fine-tune of the nominal policy halves the mean
 held-out drop (0.120 → 0.056), almost all of it on action latency. The
-curriculum row (and its budget line) is the only thing still marked
-`TODO(measure)`; every number
+curriculum never reached lift: it cleared reach at 54 k steps, then
+plateaued on push (rolling success at most 0.60 against the 0.8 gate) for
+the rest of the 20 M. Every number
 comes from the named command and its JSON, never from a keyboard.
 
 **Walkthrough:** https://aungkaung1928.github.io/projects/so-arm100.html — the bench and the three policy projects built on it, explained end to end.
@@ -84,13 +85,21 @@ is worth the steps spent on reach and push is the measurement:
 
 | run | steps to lift ≥ 0.6 (rolling 100) | final eval success (20 episodes) | seeds run |
 |---|---|---|---|
-| curriculum | TODO(measure) | TODO(measure) | 1 (seed 0) |
+| curriculum | not reached in 20 M (stuck on push) | 0.45 on push; lift never started | 1 (seed 0) |
 | from scratch | 0.996 M | 1.00 | 1 (seed 0) |
 
 One seed, so these are one sample each and carry no spread; the plan's three
 seeds did not fit the CPU budget. From scratch, `lift` crossed 0.6 inside the
 first million steps once `--no-terminate-on-success` removed the hover
 exploit, which leaves the curriculum little room to win on this task.
+
+It did not win; it did not finish. Reach promoted at 54 k steps, then push
+plateaued: rolling success peaked at 0.60 (at 17.2 M) against its 0.8 gate,
+so 99.7% of the budget went to push and lift was never trained. What
+failed is the gate, not the transfer: on this bench, push at 0.8 is a harder
+bar than lift at 0.6 is from scratch, so a curriculum ordered by intuition
+blocked the task it was meant to help. One seed. The next test is a lower
+push gate or a step cap per stage, not a claim that curricula cannot help.
 
 ```
 F="--dr none --seed 0 --target-kl 0.02 --no-terminate-on-success"
@@ -221,7 +230,7 @@ budget_hours = total_steps / (env_steps_per_s_training × 3600)
 | quantity | value |
 |---|---|
 | training env-steps/s, 8 workers (`train.py` log, mean over updates) | 3,043 (chunk 1), 2,425 (chunk 2) |
-| steps to lift ≥ 0.6 with curriculum | TODO(measure) |
+| steps to lift ≥ 0.6 with curriculum | not reached in 20 M (stage stuck at push) |
 | wall-clock for one 20 M-step run | 2 h 10 min (59 + 70 min) |
 
 Runs are chunked (`--chunk-steps`, `--resume`) because the machine is shared
