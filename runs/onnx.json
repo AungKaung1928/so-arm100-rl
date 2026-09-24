@@ -1,0 +1,18 @@
+{
+  "ckpt": "runs/lift_ft_dr/policy.pt",
+  "onnx": "runs/policy.onnx",
+  "bytes": 297527,
+  "max_abs_diff": 2.1457672119140625e-06,
+  "verified": true,
+  "latency": {
+    "p50_ms": 0.00811500103736762,
+    "p99_ms": 0.014849009057797949,
+    "mean_ms": 0.008533135973266326,
+    "n": 2000,
+    "threads": 1
+  },
+  "params": 73990,
+  "so_arm100_sim": "0.1.0",
+  "model_commit": "822c2d8f877dd166c5b7d3c9f7e3c3b6589473b7",
+  "date": "2026-09-24 13:19"
+}

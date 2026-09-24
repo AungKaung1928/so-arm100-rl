@@ -48,6 +48,7 @@ class Config:
     color: str = "red"
     curriculum: bool = True
     dr: str = "none"                # none | full
+    terminate_on_success: bool = True  # False: run to the step limit (lift, see README "hover exploit")
     total_steps: int = 20_000_000
     num_envs: int = 8
     num_steps: int = 128
@@ -58,6 +59,7 @@ class Config:
     update_epochs: int = 8
     num_minibatches: int = 8
     clip_coef: float = 0.2
+    target_kl: float = 0.0          # 0 = off; else stop the epoch loop once mean approx KL passes it
     clip_vloss: bool = True
     ent_coef: float = 0.0
     vf_coef: float = 0.5
@@ -72,6 +74,7 @@ class Config:
     thresholds: dict = field(default_factory=dict)
     out: str = "runs/ppo"
     tag: str = "ppo"
+    init_from: str = ""             # warm start: weights + normaliser from this checkpoint, fresh optimizer
 
     @property
     def batch_size(self):
@@ -195,6 +198,8 @@ class PPO:
         idx = np.arange(n)
         clipfracs, approx_kls, pg_losses, v_losses = [], [], [], []
         for _ in range(cfg.update_epochs):
+            if cfg.target_kl > 0 and approx_kls and np.mean(approx_kls[-cfg.num_minibatches:]) > cfg.target_kl:
+                break
             np.random.shuffle(idx)
             for s in range(0, n, cfg.minibatch_size):
                 mb = idx[s:s + cfg.minibatch_size]
@@ -223,7 +228,7 @@ class PPO:
                     pg_losses.append(pg_loss.item())
                     v_losses.append(v_loss.item())
         self.update_i += 1
-        return {"clipfrac": float(np.mean(clipfracs)), "approx_kl": float(np.mean(approx_kls)),
+        return {"epochs": len(approx_kls) // max(cfg.num_minibatches, 1), "clipfrac": float(np.mean(clipfracs)), "approx_kl": float(np.mean(approx_kls)),
                 "pg_loss": float(np.mean(pg_losses)), "v_loss": float(np.mean(v_losses)),
                 "sigma": float(self.agent.log_std.detach().exp().mean()),
                 "saturation": self.saturated / max(self.total_actions, 1)}

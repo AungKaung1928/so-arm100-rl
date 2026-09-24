@@ -30,22 +30,24 @@ cat <<'MSG'
 Each run is 8 processes for hours. Chunk it (--chunk-steps) and resume;
 never leave it unattended. The box check refuses to start on a loaded machine.
 
-    nice -n 10 python train.py --task lift --curriculum    --dr none --out runs/lift_cur_nominal --seed 0
-    nice -n 10 python train.py --task lift --curriculum    --dr full --out runs/lift_cur_dr      --seed 0
-    nice -n 10 python train.py --task lift --no-curriculum --dr none --out runs/lift_scr_nominal --seed 0
+    F="--seed 0 --target-kl 0.02 --no-terminate-on-success"
+    nice -n 10 python train.py --task lift --no-curriculum --dr none $F --out runs/lift_scr_nominal
+    nice -n 10 python train.py --task lift --curriculum    --dr none $F --out runs/lift_cur_nominal
+    nice -n 10 python train.py --task lift --no-curriculum --dr full $F --total-steps 10000000 \
+        --init-from runs/lift_scr_nominal/policy.pt --out runs/lift_ft_dr
 
-Repeat with --seed 1 and 2 for the steps-to-threshold table.
+Repeat with --seed 1 and 2 for a spread on the steps-to-threshold table.
 MSG
 
 hr "3/4  the held-out gap table"
 cat <<'MSG'
-    python eval_gap.py --ckpt runs/lift_cur_nominal/policy.pt --task lift --tag nominal
-    python eval_gap.py --ckpt runs/lift_cur_dr/policy.pt      --task lift --tag dr
+    python eval_gap.py --ckpt runs/lift_scr_nominal/policy.pt --task lift --tag nominal --jobs 8
+    python eval_gap.py --ckpt runs/lift_ft_dr/policy.pt       --task lift --tag dr      --jobs 8
     python compare_gap.py runs/gap_nominal.json runs/gap_dr.json
 MSG
 
 hr "4/4  ONNX export and one-thread latency"
-echo "    python export_onnx.py --ckpt runs/lift_cur_dr/policy.pt --out runs/policy.onnx"
+echo "    python export_onnx.py --ckpt runs/lift_ft_dr/policy.pt --out runs/policy.onnx"
 for f in runs/gap_nominal.json runs/gap_dr.json; do
   [ -f "$f" ] && "$PY" - "$f" <<'PY'
 import json, sys

@@ -5,6 +5,8 @@
 
 `--chunk-steps` stops after that many env steps in THIS invocation and
 writes a checkpoint; rerun with `--resume runs/<tag>/ckpt.pt` to continue.
+`--init-from <ckpt>` starts a new run from another run's weights and
+normaliser (fine-tuning), with a fresh optimizer and step count.
 Runs are chunked because the machine is shared and cannot be left
 unattended; nothing about the algorithm needs it.
 
@@ -37,7 +39,8 @@ from so_arm100_rl.ppo import PPO, Config, Throughput, compute_gae, FrozenPolicy 
 def make_vec(cfg, task):
     dr = DRConfig() if cfg.dr == "full" else None
     return VecEnv(n=cfg.num_envs, seed=cfg.seed * 1000, task=task, obs_mode="state",
-                  action_mode="delta", dr=dr)
+                  action_mode="delta", dr=dr,
+                  terminate_on_success=cfg.terminate_on_success)
 
 
 def evaluate_mean_action(ppo, task, episodes, seed=777_777):
@@ -78,6 +81,13 @@ def train(cfg: Config, resume=None, chunk_steps=None, verbose=True):
             print(f"resumed from {resume} at step {ppo.global_step:,}, stage {cur.stage}")
     else:
         ppo = PPO(cfg, obs_dim, act_dim)
+        if cfg.init_from:
+            src, _ = PPO.load(cfg.init_from, restore_rng=False)
+            ppo.agent.load_state_dict(src.agent.state_dict())
+            ppo.norm.load_state_dict(src.norm.state_dict())
+            if verbose:
+                print(f"initialised from {cfg.init_from} (weights + normaliser; optimizer, "
+                      f"step count and LR schedule start fresh)")
 
     vec = make_vec(cfg, cur.task)
     obs = vec.reset()["state"]
@@ -157,7 +167,7 @@ def train(cfg: Config, resume=None, chunk_steps=None, verbose=True):
         if verbose and (ppo.update_i % 5 == 0 or ppo.update_i == 1):
             print(f"  upd {ppo.update_i:>5}  step {ppo.global_step:>10,}  {cur.stage:<10} "
                   f"succ {cur.rolling_success:5.2f}  ret {row['rolling_return'] or 0:8.2f}  "
-                  f"{rate:7,.0f} env-steps/s  clip {stats['clipfrac']:.3f}  sigma {stats['sigma']:.3f}"
+                  f"{rate:7,.0f} env-steps/s  clip {stats['clipfrac']:.3f}  sigma {stats['sigma']:.3f}  kl {stats['approx_kl']:.4f}  ep {stats['epochs']}"
                   + (f"  eval {row['eval_success']:.2f}" if "eval_success" in row else ""))
         if warn and verbose:
             print("  WARNING", warn)
@@ -194,6 +204,8 @@ def parse():
     p.add_argument("--no-curriculum", dest="curriculum", action="store_false")
     p.add_argument("--no-anneal-lr", dest="anneal_lr", action="store_false", default=True)
     p.add_argument("--no-clip-vloss", dest="clip_vloss", action="store_false", default=True)
+    p.add_argument("--no-terminate-on-success", dest="terminate_on_success",
+                   action="store_false", default=True)
     p.add_argument("--threshold", action="append", default=[],
                    help="stage=value, e.g. --threshold lift=0.5 (repeatable)")
     p.add_argument("--chunk-steps", type=int, default=0)
