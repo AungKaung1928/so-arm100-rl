@@ -187,7 +187,7 @@ python compare_gap.py runs/gap_nominal.json runs/gap_dr.json
 |---|---|---|---|
 | nominal | 0.998 ± 0.004 | 0.998 ± 0.004 | +0.000 |
 | heavy (mass 3×) | 0.998 ± 0.004 | 0.988 ± 0.008 | −0.010 |
-| slippery (friction 0.3×) | 0.998 ± 0.004 | 0.998 ± 0.004 | +0.000 |
+| slippery (friction 0.3×, inert) | 0.998 ± 0.004 | 0.998 ± 0.004 | +0.000 |
 | weak (kp 0.45×) | 0.982 ± 0.013 | 1.000 ± 0.000 | +0.018 |
 | laggy (3 steps) | 0.458 ± 0.052 | 0.760 ± 0.030 | **+0.302** |
 | noisy (3× obs noise) | 0.956 ± 0.017 | 0.948 ± 0.024 | −0.008 |
@@ -203,8 +203,9 @@ repository and are the ceiling to read these against.
 The DR fine-tune halves the mean drop, and almost all of it is one cell:
 three steps of action latency, one step past the DR range, costs the
 nominal policy more than half its success (0.998 → 0.458) and the DR policy
-a quarter (0.998 → 0.760). Mass and friction shifts cost neither policy
-anything; this `lift` policy was never limited by them. The small cube and
+a quarter (0.998 → 0.760). The mass shift costs neither policy anything.
+The friction row says nothing at all: the `slippery` cell is inert (see the
+bench README), so it equals nominal by construction. The small cube and
 the in-range DR cell gain 0.07–0.08. Two things weaken the claim: one
 training seed per column (the ± is over evaluation seeds only, so it says
 nothing about how a second training run would land), and the DR column
