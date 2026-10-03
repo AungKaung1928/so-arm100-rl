@@ -5,6 +5,65 @@ tabletop tasks, with a reach → push → lift curriculum, with and without
 domain randomisation, evaluated on physics the policy never trained on.
 CPU only: 8 forked MuJoCo processes, one thread each.
 
+**Walkthrough:** https://aungkaung1928.github.io/projects/so-arm100.html — the bench and the three policy projects built on it, explained end to end.
+
+## At a glance
+
+Measured on 2026-09-24, one training seed (seed 0), lift task, 20 M steps per run:
+
+```mermaid
+flowchart LR
+    subgraph CUR["Curriculum run, nominal physics, 20 M steps"]
+        direction LR
+        R["reach<br/>gate 0.8<br/>cleared at 54 k steps"] --> P["push<br/>gate 0.8<br/>rolling success peaked 0.60 at 17.2 M<br/>99.7% of the budget spent here"] -. "never promoted" .-> L["lift<br/>gate 0.6<br/>never trained"]
+    end
+    subgraph SCR["lift from scratch, --no-curriculum"]
+        direction LR
+        N["nominal physics<br/>lift ≥ 0.6 at 0.996 M steps<br/>final eval 1.00 (20 episodes)"] -- "--init-from, +10 M steps under --dr full" --> FT["DR fine-tune<br/>mean held-out drop 0.120 → 0.056<br/>laggy cell 0.458 → 0.760"]
+        D["DR from scratch<br/>rolling success peaked 0.09 at 2.7 M<br/>exactly 0 for the last 700 updates, stopped at 4.89 M"]
+    end
+    style L stroke-dasharray: 5 5
+    style D stroke-dasharray: 5 5
+```
+
+Held-out gap, `compare_gap.py`, 100 episodes × 5 evaluation seeds per cell, ± is the sd over seeds:
+
+| physics | nominal-trained | DR fine-tuned | delta |
+|---|---|---|---|
+| nominal | 0.998 ± 0.004 | 0.998 ± 0.004 | +0.000 |
+| heavy (mass 3×) | 0.998 ± 0.004 | 0.988 ± 0.008 | −0.010 |
+| slippery (friction 0.3×, inert) | 0.998 ± 0.004 | 0.998 ± 0.004 | +0.000 |
+| weak (kp 0.45×) | 0.982 ± 0.013 | 1.000 ± 0.000 | +0.018 |
+| laggy (3 steps) | 0.458 ± 0.052 | 0.760 ± 0.030 | **+0.302** |
+| noisy (3× obs noise) | 0.956 ± 0.017 | 0.948 ± 0.024 | −0.008 |
+| small (9 mm) | 0.878 ± 0.051 | 0.960 ± 0.020 | +0.082 |
+| dr (in-range) | 0.888 ± 0.038 | 0.958 ± 0.013 | +0.070 |
+| **mean drop vs own nominal** (6 held-out cells) | 0.120 | 0.056 | −0.064 |
+
+### Results
+
+| method | metric | value | condition |
+|---|---|---|---|
+| PPO, lift from scratch, nominal | steps to lift ≥ 0.6 (rolling 100) | 0.996 M | seed 0; final eval 1.00 over 20 episodes |
+| PPO, curriculum reach → push → lift | steps to lift ≥ 0.6 | not reached in 20 M | stuck on push; 0.45 on push, lift never started |
+| PPO, lift from scratch, `--dr full` | rolling success | ≤ 0.09 through 4.9 M | stalled, stopped |
+| nominal-trained policy | mean drop vs own nominal | 0.120 | 6 held-out cells |
+| DR fine-tuned policy (+10 M steps) | mean drop vs own nominal | 0.056 | 6 held-out cells |
+| training throughput, 8 workers | env-steps/s | 3,043 (chunk 1), 2,425 (chunk 2) | chunk 2 on a shared host; DR fine-tune 2,546 |
+| one 20 M-step run | wall-clock | 2 h 10 min | 59 + 70 min |
+| ONNX export (DR fine-tune) | 1-thread latency p50 / p99 | 0.008 / 0.015 ms | n = 2000; max \|torch − onnx\| 2.1e-6; 298 kB / 73,990 parameters |
+| Docker image | tests inside | 16 passed | 1.84 GB, built 2026-09-23 |
+
+### Key points
+
+- **The DR fine-tune halves the mean held-out drop.** 0.120 → 0.056 over six held-out cells, almost all of it on one cell: three steps of action latency, one step past the DR range, cost the nominal policy 0.998 → 0.458 and the DR policy 0.998 → 0.760, while the mass shift cost neither and the small cube and in-range `dr` cell gained 0.07–0.08.
+- **The curriculum never reached lift.** Reach promoted at 54 k steps, push plateaued at rolling 0.60 against its 0.8 gate so 99.7% of the 20 M went to push, whereas lift from scratch crossed 0.6 at 0.996 M steps: the gate failed, not the transfer.
+- **DR from scratch stalled.** The recipe that crossed 0.6 on nominal physics at 1.0 M peaked at 0.09 at 2.7 M under `--dr full`, sat at exactly 0 for the last 700 updates and a return of 15–30 (nominal was at 150 by 1 M), and was replaced by a 10 M-step fine-tune of the nominal policy.
+- **Two training failures were visible only in the diagnostics.** Without `--target-kl 0.02` the clip fraction hit 0.77, approximate KL 1.44 and σ collapsed 0.50 → 0.054; with it, lift learned to hover the cube at 4.7–4.9 cm under the 5.0 cm line (3 of 20 probe episodes crossed) because success terminated the episode, fixed by `--no-terminate-on-success` for training only.
+- **One training seed per column, and 30 M vs 20 M steps.** Every ± is over evaluation seeds of one trained policy, the DR column has 10 M more training steps, and the 30 M-step nominal control that separates randomisation from training length has not been run; nothing here is a claim about the physical arm.
+
+<details><summary><b>The two questions, what is in the box, and the algorithm</b></summary>
+
 The question this repository answers is not "can PPO learn to lift a cube in
 simulation" -- it can -- but two measured ones:
 
@@ -13,7 +72,7 @@ simulation" -- it can -- but two measured ones:
    (`heavy`, `slippery`, `weak`, `laggy`, `noisy`, `small`, and `nominal`
    as the reference), each outside the DR range in at least one factor. A
    nominal-trained and a DR-trained policy are evaluated on all of them
-   under the same 100-episode × 5-seed protocol, and the table below is the
+   under the same 100-episode × 5-seed protocol, and the table above is the
    result.
 2. **Does the curriculum buy anything?** Steps-to-threshold on `lift` with
    the reach → push → lift curriculum versus `lift` from scratch, same
@@ -28,9 +87,7 @@ plateaued on push (rolling success at most 0.60 against the 0.8 gate) for
 the rest of the 20 M. Every number
 comes from the named command and its JSON, never from a keyboard.
 
-**Walkthrough:** https://aungkaung1928.github.io/projects/so-arm100.html — the bench and the three policy projects built on it, explained end to end.
-
-## What is in the box
+### What is in the box
 
 ```
 so_arm100_rl/
@@ -46,7 +103,7 @@ export_onnx.py     normaliser + actor mean as one ONNX graph, verified, timed on
 tests/             21 checks incl. a hand-computed GAE case and a bit-exact resume
 ```
 
-## The algorithm, and the two places it differs from a textbook PPO
+### The algorithm, and the two places it differs from a textbook PPO
 
 The loop is adapted from the author's `ppo-from-scratch` (clipped surrogate,
 GAE, orthogonal init, separate trunks). Two things the cart-pole never
@@ -60,7 +117,7 @@ forced:
   1/(1−γ) ≈ 100 steps before every step limit. `tests/test_gae.py` has a
   four-step case with one of each, worked by hand. Terminating on success
   turned out to be exploitable on `lift`, so training there runs with
-  `--no-terminate-on-success`; see [Three training failures](#three-training-failures-kept-as-evidence).
+  `--no-terminate-on-success`; see the three training failures below.
 - **A running observation normaliser.** The 25-d state mixes radians,
   metres and a scaled velocity; group RMS spans more than an order of
   magnitude. The normaliser is updated from rollouts and **frozen** at
@@ -70,7 +127,9 @@ Actions are clipped to [−1, 1] at the env boundary while the log-probability
 uses the unclipped sample. That is biased and common; the saturation
 fraction is logged and reported so its size is visible.
 
-## Curriculum
+</details>
+
+<details><summary><b>Curriculum</b></summary>
 
 Stages `reach → push → lift` (`pick_place` with `--task pick_place`).
 Promotion when the rolling success over the last 100 finished episodes
@@ -108,7 +167,9 @@ nice -n 10 python train.py --task lift --no-curriculum $F --out runs/lift_scr_no
 ```
 `runs/<tag>/summary.json → reached_threshold_at`.
 
-## Three training failures, kept as evidence
+</details>
+
+<details><summary><b>Three training failures, kept as evidence</b></summary>
 
 All three runs were stopped, not tuned into silence, and their logs and
 checkpoints are kept (`runs/*_aborted/`, `runs/lift_scr_dr_stalled/`,
@@ -158,7 +219,9 @@ In all three runs the headline training metrics (rolling success, return) either
 looked fine or lied. Clip fraction, KL, σ and a direct probe of the
 behaviour showed the failures.
 
-## Domain randomisation and the held-out gap
+</details>
+
+<details><summary><b>Domain randomisation and the held-out gap</b></summary>
 
 `--dr full` samples the bench's `DRConfig` at every reset: cube mass
 0.5–2×, sliding friction 0.5–1.5×, servo gain 0.6–1.4×, joint damping and
@@ -218,7 +281,11 @@ is evidence that randomisation over *these* factors transfers to shifts in
 *these* factors. It says nothing about a real SO-ARM100, whose unmodelled
 effects (backlash, cable friction, camera latency) are not in either column.
 
-## Budget
+</details>
+
+<details><summary><b>Budget and ONNX export</b></summary>
+
+### Budget
 
 One env step is 25 physics steps plus observation and reward. The bench's
 throughput sweep gives env-steps/s at 8 processes; PPO adds the forward
@@ -252,7 +319,7 @@ the nominal run and 78 % for the DR fine-tune: the log-probability bias noted
 above is not small on this task. The DR fine-tune ran at 2,546 env-steps/s
 mean, 10 M steps in 68 min, on the same shared host.
 
-## ONNX export
+### ONNX export
 
 ```
 python export_onnx.py --ckpt runs/lift_ft_dr/policy.pt --out runs/policy.onnx
@@ -272,6 +339,8 @@ one core per env step, roughly 300 times the forward pass. Output
 | max \|torch − onnx\| (1000 observations) | 2.1e-6 |
 | size / parameters | 298 kB / 73,990 |
 
+</details>
+
 ## Reproducing
 
 ```
@@ -285,7 +354,7 @@ pip install -e .
 `docker build -t so-arm100-rl . && docker run --rm so-arm100-rl` runs the
 tests in a clean image (no GL; nothing here renders). Image built on 2026-09-23 and its default command passed inside it (16 tests passed), image size 1.84 GB.
 
-## Limits, stated
+<details><summary><b>Limits, stated</b></summary>
 
 - State-based: the policy sees the cube's true position. Image-based control
   is the imitation and language repositories' problem, not this one's.
@@ -296,6 +365,8 @@ tests in a clean image (no GL; nothing here renders). Image built on 2026-09-23 
 - One training seed per configuration. Every ± in this README is over
   evaluation seeds of one trained policy, not over training runs.
 - No claim about hardware. See the gap section.
+
+</details>
 
 ## Licence
 
