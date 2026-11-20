@@ -67,6 +67,11 @@ def evaluate_mean_action(ppo, task, episodes, seed=777_777):
 
 
 def train(cfg: Config, resume=None, chunk_steps=None, verbose=True):
+    if resume:
+        # The checkpoint's config wins over the command line, and it must be in place before the
+        # curriculum and the envs are built (a --no-curriculum run resumed with default flags
+        # otherwise restarts the reach -> push -> lift curriculum).
+        cfg = Config(**torch.load(resume, map_location="cpu", weights_only=False)["config"])
     os.makedirs(cfg.out, exist_ok=True)
     torch.manual_seed(cfg.seed)
     np.random.seed(cfg.seed)

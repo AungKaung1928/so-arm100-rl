@@ -36,3 +36,17 @@ def test_train_smoke_and_resume(tmp_path):
     assert all(row["env_steps_per_s"] > 0 for row in rows)
     assert os.path.exists(os.path.join(out, "policy.pt"))
     assert time.perf_counter() - t0 < 90
+
+
+def test_resume_keeps_checkpoint_config(tmp_path):
+    """A --no-curriculum lift run resumed with no other flags must stay on lift (it used to restart
+    the reach -> push -> lift curriculum from the command-line defaults)."""
+    out = os.path.join(tmp_path, "nocur")
+    r = run(["--task", "lift", "--no-curriculum", "--total-steps", "1024", "--num-envs", "2",
+             "--num-steps", "64", "--update-epochs", "1", "--num-minibatches", "2", "--eval-every", "8", "--eval-episodes", "2",
+             "--ckpt-every", "4", "--chunk-steps", "256", "--out", out, "--quiet", "--force"])
+    assert r.returncode == 0, r.stdout + r.stderr
+    r = run(["--resume", os.path.join(out, "ckpt.pt"), "--out", out, "--quiet", "--force"])
+    assert r.returncode == 0, r.stdout + r.stderr
+    stages = {json.loads(line)["stage"] for line in open(os.path.join(out, "log.jsonl"))}
+    assert stages == {"lift"}, stages
