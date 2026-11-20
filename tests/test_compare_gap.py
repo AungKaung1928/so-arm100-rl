@@ -35,3 +35,14 @@ def test_saved_runs_reproduce_readme_headline():
     # README.md:41 -> mean drop 0.120 (nominal-trained) vs 0.056 (DR), -0.064
     a, b = (json.load(open(os.path.join(ROOT, "runs", f))) for f in ("gap_nominal.json", "gap_dr.json"))
     assert _last_row(table(a, b))[1:] == ["0.120", "0.056", "-0.064"]
+
+
+def test_realfit_runs_match_readme_sentence():
+    # README.md:46-48 -> real_fit: nominal-trained 0.996 ± 0.005, DR 0.992 ± 0.013; nominal cells 0.998; cost <= 0.006
+    readme = " ".join(open(os.path.join(ROOT, "README.md")).read().split())
+    n, d = (json.load(open(os.path.join(ROOT, "runs", f"gap_realfit_{k}.json")))["cells"] for k in ("nominal", "dr"))
+    fmt = lambda c: f"{c['success_rate']:.3f} ± {c['success_std']:.3f}"
+    assert f"nominal-trained {fmt(n['real_fit'])}, DR fine-tuned {fmt(d['real_fit'])}" in readme
+    assert n["nominal"]["success_rate"] == 0.998 and "reproduce 0.998 exactly" in readme
+    cost = max(r["nominal"]["success_rate"] - r["real_fit"]["success_rate"] for r in (n, d))
+    assert f"at most {cost:.3f}" in readme
