@@ -50,7 +50,26 @@ latency (`laggy`) still is.
 
 `--dr real` trains with `DRConfig.real_informed()` (so-arm100-sim f0e0fda or later): the full
 DR ranges with joint frictionloss widened to 0.5–3.5×, so it covers every per-episode real fit.
-Only a 1,024-step smoke run exists (rc 0); no policy trained with it yet.
+Trained 2026-11-21 with the same recipe as the DR fine-tune (init from the nominal lift policy,
+seed 0, 10 M steps, target-kl 0.02; the only config difference is `dr: real`), then
+`eval_gap.py --tag real`, same 100 × 5 (`runs/gap_real.json`):
+
+| physics | DR fine-tuned | `--dr real` fine-tuned | delta |
+|---|---|---|---|
+| nominal | 0.998 ± 0.004 | 0.914 ± 0.027 | −0.084 |
+| heavy (mass 3×) | 0.988 ± 0.008 | 0.924 ± 0.035 | −0.064 |
+| slippery | 0.998 ± 0.004 | 0.914 ± 0.027 | −0.084 |
+| weak | 1.000 ± 0.000 | 0.960 ± 0.019 | −0.040 |
+| laggy | 0.760 ± 0.030 | 0.506 ± 0.060 | −0.254 |
+| noisy | 0.948 ± 0.024 | 0.938 ± 0.013 | −0.010 |
+| small | 0.960 ± 0.020 | 0.792 ± 0.075 | −0.168 |
+| real_fit | 0.992 ± 0.013 | 0.930 ± 0.033 | −0.062 |
+| dr (default ranges) | 0.958 ± 0.013 | 0.876 ± 0.009 | −0.082 |
+
+Widening friction to cover the real fits made this policy worse on every cell, including
+`real_fit`, which is now inside its training range. One training seed each, so a training-seed
+effect is not ruled out; the training curve's own 20-episode eval stayed 0.70–1.00 throughout
+(final 0.95). Result kept as measured; the default DR fine-tune stays the headline policy.
 
 ### Results
 
