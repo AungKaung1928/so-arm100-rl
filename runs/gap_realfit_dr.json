@@ -1,0 +1,71 @@
+{
+  "ckpt": "runs/lift_ft_dr/policy.pt",
+  "task": "lift",
+  "episodes": 100,
+  "seeds": 5,
+  "cells": {
+    "nominal": {
+      "task": "lift:red",
+      "physics": "nominal",
+      "dr": null,
+      "n_episodes": 100,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "success_rate": 0.998,
+      "success_std": 0.004472135954999583,
+      "per_seed": [
+        0.99,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "return_mean": 10.120677348403063,
+      "steps_mean": 27.334,
+      "first_success_p50": 19.0,
+      "first_success_p90": 50.0,
+      "wall_s": 6.714471796003636,
+      "so_arm100_sim": "0.1.0",
+      "model_commit": "822c2d8f877dd166c5b7d3c9f7e3c3b6589473b7",
+      "date": "2026-11-20 09:55"
+    },
+    "real_fit": {
+      "task": "lift:red",
+      "physics": "real_fit",
+      "dr": null,
+      "n_episodes": 100,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "success_rate": 0.992,
+      "success_std": 0.013038404810405309,
+      "per_seed": [
+        1.0,
+        1.0,
+        0.99,
+        1.0,
+        0.97
+      ],
+      "return_mean": 10.219642651845286,
+      "steps_mean": 28.798,
+      "first_success_p50": 19.0,
+      "first_success_p90": 50.0,
+      "wall_s": 6.853368463001971,
+      "so_arm100_sim": "0.1.0",
+      "model_commit": "822c2d8f877dd166c5b7d3c9f7e3c3b6589473b7",
+      "date": "2026-11-20 09:55"
+    }
+  },
+  "so_arm100_sim": "0.1.0",
+  "model_commit": "822c2d8f877dd166c5b7d3c9f7e3c3b6589473b7",
+  "date": "2026-11-20 09:55"
+}

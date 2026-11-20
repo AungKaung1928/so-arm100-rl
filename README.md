@@ -40,6 +40,14 @@ Held-out gap, `compare_gap.py`, 100 episodes × 5 evaluation seeds per cell, ± 
 | dr (in-range) | 0.888 ± 0.038 | 0.958 ± 0.013 | +0.070 |
 | **mean drop vs own nominal** (6 held-out cells) | 0.120 | 0.056 | −0.064 |
 
+Servo fitted to real SO-100 data (`real_fit`: kp 0.78×, joint frictionloss 2.5×, from
+so-arm100-sim's real2sim fit; needs so-arm100-sim a6f1691 or later, the pinned v0.1.0 does not
+have the cell). Added 2026-11-20, `eval_gap.py --physics nominal real_fit`, same 100 × 5:
+nominal-trained 0.996 ± 0.005, DR fine-tuned 0.992 ± 0.013 (`runs/gap_realfit_{nominal,dr}.json`;
+the nominal cells reproduce 0.998 exactly). The fitted real servo costs these lift policies at
+most 0.006, so the measured servo dynamics are not where this policy's sim-to-real risk is;
+latency (`laggy`) still is.
+
 ### Results
 
 | method | metric | value | condition |
