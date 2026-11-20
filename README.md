@@ -48,6 +48,10 @@ the nominal cells reproduce 0.998 exactly). The fitted real servo costs these li
 most 0.006, so the measured servo dynamics are not where this policy's sim-to-real risk is;
 latency (`laggy`) still is.
 
+`--dr real` trains with `DRConfig.real_informed()` (so-arm100-sim f0e0fda or later): the full
+DR ranges with joint frictionloss widened to 0.5–3.5×, so it covers every per-episode real fit.
+Only a 1,024-step smoke run exists (rc 0); no policy trained with it yet.
+
 ### Results
 
 | method | metric | value | condition |

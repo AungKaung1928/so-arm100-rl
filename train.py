@@ -37,7 +37,11 @@ from so_arm100_rl.ppo import PPO, Config, Throughput, compute_gae, FrozenPolicy 
 
 
 def make_vec(cfg, task):
-    dr = DRConfig() if cfg.dr == "full" else None
+    dr = None
+    if cfg.dr == "full":
+        dr = DRConfig()
+    elif cfg.dr == "real":          # needs so-arm100-sim f0e0fda or later
+        dr = DRConfig.real_informed()
     return VecEnv(n=cfg.num_envs, seed=cfg.seed * 1000, task=task, obs_mode="state",
                   action_mode="delta", dr=dr,
                   terminate_on_success=cfg.terminate_on_success)
@@ -220,8 +224,8 @@ if __name__ == "__main__":
     require_quiet_box(a.force, quiet=a.quiet)
     kw = {k: getattr(a, k) for k in asdict(Config()) if hasattr(a, k)}
     kw["thresholds"] = {s: float(v) for s, v in (t.split("=") for t in a.threshold)}
-    if a.dr not in ("none", "full"):
-        raise SystemExit("--dr must be none or full")
+    if a.dr not in ("none", "full", "real"):
+        raise SystemExit("--dr must be none, full or real")
     cfg = Config(**kw)
     print(f"=== so-arm100-rl  task={cfg.task}  curriculum={cfg.curriculum}  dr={cfg.dr}  "
           f"seed={cfg.seed}  out={cfg.out} ===")
