@@ -93,6 +93,11 @@ three seeds (+0.056, +0.224, +0.310) and far less seed-dependent (sd 0.020 vs 0.
 tested; a higher-friction, lower-kp servo slows the arm, which may make one extra step of lag
 matter less. Three seeds; read it as a direction, not an effect size.
 
+The lead is specific to lag. The same six policies on the other held-out cells
+(`runs/gap_abx_*.json`, 100 × 5 each), paired B − A: heavy +0.022 ± 0.114, weak +0.030 ± 0.079,
+noisy +0.037 ± 0.110, small +0.018 ± 0.071, each smaller than its spread and none with B ahead in
+all three seeds. `slippery` is left out: it is inert (see below) and repeats `nominal`.
+
 ### Results
 
 | method | metric | value | condition |
