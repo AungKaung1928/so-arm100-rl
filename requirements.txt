@@ -9,4 +9,4 @@ onnxruntime==1.30.0
 pytest
 
 # The bench, pinned to a tag. Update the tag deliberately, never to "main".
-so-arm100-sim @ git+https://github.com/AungKaung1928/so-arm100-sim.git@552e6035e38d51cab91cf7a98b43d8deff9f0f87
+so-arm100-sim @ git+https://github.com/AungKaung1928/so-arm100-sim.git@aa9dcc60e04b22b66003c634cbbfa3b49ec78b13

@@ -47,7 +47,7 @@ class Config:
     task: str = "lift"
     color: str = "red"
     curriculum: bool = True
-    dr: str = "none"                # none | full | real (DRConfig.real_informed)
+    dr: str = "none"                # none | full | real | centred | both (train.make_vec)
     terminate_on_success: bool = True  # False: run to the step limit (lift, see README "hover exploit")
     total_steps: int = 20_000_000
     num_envs: int = 8
