@@ -234,8 +234,11 @@ if __name__ == "__main__":
     if a.dr not in ("none", "full", "real", "centred"):
         raise SystemExit("--dr must be none, full, real or centred")
     cfg = Config(**kw)
-    print(f"=== so-arm100-rl  task={cfg.task}  curriculum={cfg.curriculum}  dr={cfg.dr}  "
-          f"seed={cfg.seed}  out={cfg.out} ===")
+    if a.resume:   # the checkpoint's config replaces these flags inside train()
+        print(f"=== so-arm100-rl  resume {a.resume} ===")
+    else:
+        print(f"=== so-arm100-rl  task={cfg.task}  curriculum={cfg.curriculum}  dr={cfg.dr}  "
+              f"seed={cfg.seed}  out={cfg.out} ===")
     s = train(cfg, resume=a.resume or None, chunk_steps=a.chunk_steps or None, verbose=not a.quiet)
     print(f"  steps {s['steps']:,}  final stage {s['final_stage']}  eval success {s['final_eval_success']:.2f}")
     print(f"  transitions {s['transitions']}")
