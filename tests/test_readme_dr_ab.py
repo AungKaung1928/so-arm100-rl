@@ -82,3 +82,18 @@ def test_lag_failmode_sentence_matches_runs():
     assert all(d[f"centred_s{s}"]["failed_after_grasp"] < d[f"full_s{s}"]["failed_after_grasp"] for s in (0, 1, 2))
     assert (f"no grasp at all are {rng('full', 'failed_no_grasp')} for A and "
             f"{rng('centred', 'failed_no_grasp')} for B") in text
+
+
+def test_grasp_contact_sentence_matches_runs():
+    d = json.load(open(os.path.join(ROOT, "runs", "lag_failmode.json")))["policies"]
+    text = " ".join(README.split())
+
+    def rng(arm, key, pct=False):
+        v = [d[f"{arm}_s{s}"][key] for s in (0, 1, 2)]
+        return f"{100 * min(v):.0f}–{100 * max(v):.0f}" if pct else f"{min(v)}–{max(v)}"
+    assert (f"({rng('centred', 'grasp_onsets')} onsets per 100 episodes against "
+            f"{rng('full', 'grasp_onsets')} for A, more in every seed)") in text
+    assert all(d[f"centred_s{s}"]["grasp_onsets"] > d[f"full_s{s}"]["grasp_onsets"] for s in (0, 1, 2))
+    assert f"({rng('centred', 'grasp_losses')} against {rng('full', 'grasp_losses')})" in text
+    lo = min(v["losses_on_table"] for v in d.values()); hi = max(v["losses_on_table"] for v in d.values())
+    assert f"{100 * lo:.0f}–{100 * hi:.0f} % of losses with the cube still on the table" in text

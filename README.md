@@ -101,7 +101,11 @@ the ±1 clip, and the two arms' ranges overlap (`tools/action_stats.py` → `run
 `runs/lag_failmode.json`, per-step `grasped` flag, 100 episodes per policy): episodes that grasp
 the cube at some step and still fail are 22–25 % for A and 18–20 % for B, lower for B in every
 seed; episodes with no grasp at all are 9–41 % for A and 8–13 % for B, and carry most of A's
-seed-to-seed spread. Three seeds; read it as a direction, not an effect size.
+seed-to-seed spread. B does not hold the cube better: it makes more grasp contacts (159–180
+onsets per 100 episodes against 93–144 for A, more in every seed) and loses more of them
+(84–111 against 58–77), 60–78 % of losses with the cube still on the table. That fits a policy
+that tries again after losing contact; the flag also counts brief contacts, so this is a reading
+of the counts, not a measured mechanism. Three seeds; read it as a direction, not an effect size.
 
 The lead is specific to lag. The same six policies on the other held-out cells
 (`runs/gap_abx_*.json`, 100 × 5 each), paired B − A: heavy +0.022 ± 0.114, weak +0.030 ± 0.079,

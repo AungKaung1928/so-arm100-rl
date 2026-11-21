@@ -5,32 +5,50 @@
   "full_s0": {
    "success": 0.66,
    "failed_after_grasp": 0.25,
-   "failed_no_grasp": 0.09
+   "failed_no_grasp": 0.09,
+   "grasp_onsets": 144,
+   "grasp_losses": 77,
+   "losses_on_table": 0.7402597402597403
   },
   "full_s1": {
    "success": 0.52,
    "failed_after_grasp": 0.22,
-   "failed_no_grasp": 0.26
+   "failed_no_grasp": 0.26,
+   "grasp_onsets": 111,
+   "grasp_losses": 59,
+   "losses_on_table": 0.6610169491525424
   },
   "full_s2": {
    "success": 0.35,
    "failed_after_grasp": 0.24,
-   "failed_no_grasp": 0.41
+   "failed_no_grasp": 0.41,
+   "grasp_onsets": 93,
+   "grasp_losses": 58,
+   "losses_on_table": 0.7758620689655172
   },
   "centred_s0": {
    "success": 0.69,
    "failed_after_grasp": 0.18,
-   "failed_no_grasp": 0.13
+   "failed_no_grasp": 0.13,
+   "grasp_onsets": 180,
+   "grasp_losses": 111,
+   "losses_on_table": 0.7567567567567568
   },
   "centred_s1": {
    "success": 0.69,
    "failed_after_grasp": 0.2,
-   "failed_no_grasp": 0.11
+   "failed_no_grasp": 0.11,
+   "grasp_onsets": 163,
+   "grasp_losses": 91,
+   "losses_on_table": 0.7032967032967034
   },
   "centred_s2": {
    "success": 0.74,
    "failed_after_grasp": 0.18,
-   "failed_no_grasp": 0.08
+   "failed_no_grasp": 0.08,
+   "grasp_onsets": 159,
+   "grasp_losses": 84,
+   "losses_on_table": 0.5952380952380952
   }
  }
 }
