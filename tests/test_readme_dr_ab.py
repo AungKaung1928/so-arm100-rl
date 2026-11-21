@@ -67,3 +67,12 @@ def test_action_stats_sentence_matches_runs():
             a = [v[key] for k, v in d.items() if k.startswith(f"{phys}/full_")]
             b = [v[key] for k, v in d.items() if k.startswith(f"{phys}/centred_")]
             assert min(a) <= max(b) and min(b) <= max(a), (key, phys)
+
+
+def test_lag_failmode_sentence_matches_runs():
+    d = json.load(open(os.path.join(ROOT, "runs", "lag_failmode.json")))["policies"]
+    assert len(d) == 6
+    worst = max(v["grasped_not_lifted"] for v in d.values())
+    assert f"(at most {100 * worst:.0f} % of episodes for any policy" in " ".join(README.split())
+    # "that is where B is better": B's no-grasp share is lower than A's, paired by training seed
+    assert all(d[f"centred_s{s}"]["no_grasp"] < d[f"full_s{s}"]["no_grasp"] for s in (0, 1, 2))

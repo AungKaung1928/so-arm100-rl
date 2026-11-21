@@ -96,7 +96,10 @@ frictionloss 2.5×; `tools/lag_servo.py` → `runs/gap_lagsoft_*.json`) arm A do
 B's policy was trained. It is not a gentler controller either: on `nominal` and `laggy` alike all
 six policies drive near bang-bang, mean |action| 0.915–0.935 with 83–87 % of action components at
 the ±1 clip, and the two arms' ranges overlap (`tools/action_stats.py` → `runs/action_stats.json`,
-50 episodes each). Three seeds; read it as a direction, not an effect size.
+50 episodes each). Under lag the failures sit before the lift: a failed episode almost never ends with
+the cube in the gripper (at most 3 % of episodes for any policy, `tools/lag_failmode.py` →
+`runs/lag_failmode.json`), so the extra step of lag costs the approach and grasp, and that is
+where B is better. Three seeds; read it as a direction, not an effect size.
 
 The lead is specific to lag. The same six policies on the other held-out cells
 (`runs/gap_abx_*.json`, 100 × 5 each), paired B − A: heavy +0.022 ± 0.114, weak +0.030 ± 0.079,
