@@ -73,7 +73,8 @@ effect is not ruled out; the training curve's own 20-episode eval stayed 0.70–
 
 DR A/B: `tools/dr_ab.sh` fine-tunes the nominal policy twice per training seed with the same
 recipe, arm A under `--dr full` and arm B under `--dr centred` (`DRConfig.real_centred()`:
-kp 0.65–0.77×, frictionloss 2.2–2.8×, the p10–p90 band of the per-episode real fits; all other
+kp 0.65–0.77×, frictionloss 2.2–2.8×, the p10–p90 band of the per-episode real fits on one
+pick-place dataset, which a second SO-100 dataset's fitted kp falls outside, see so-arm100-sim; all other
 ranges, latency included, as in `--dr full`; so-arm100-sim 552e603 or later), 3 M steps, seeds
 0–2, then evaluates both on `nominal`, `real_fit` and `laggy` (100 × 5). `dr_ab.py` pairs the
 arms by training seed (`runs/gap_ab_*.json` → `runs/dr_ab.json`), mean ± sd over the 3 training seeds:
