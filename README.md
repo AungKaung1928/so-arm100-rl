@@ -71,13 +71,27 @@ Widening friction to cover the real fits made this policy worse on every cell, i
 effect is not ruled out; the training curve's own 20-episode eval stayed 0.70–1.00 throughout
 (final 0.95). Result kept as measured; the default DR fine-tune stays the headline policy.
 
-Next experiment, set up and not yet run: `tools/dr_ab.sh` fine-tunes the nominal policy twice
-per training seed with the same recipe, arm A under `--dr full` and arm B under `--dr centred`
-(`DRConfig.real_centred()`: kp 0.65–0.77×, frictionloss 2.2–2.8×, the p10–p90 band of the
-per-episode real fits; so-arm100-sim 552e603 or later), 3 M steps, seeds 0–2, then evaluates
-both on `nominal`, `real_fit` and `laggy` (100 × 5). `dr_ab.py` pairs the arms by training seed
-and reports B − A per cell and each arm's nominal − `real_fit` gap, with the spread over
-training seeds. No numbers yet.
+DR A/B: `tools/dr_ab.sh` fine-tunes the nominal policy twice per training seed with the same
+recipe, arm A under `--dr full` and arm B under `--dr centred` (`DRConfig.real_centred()`:
+kp 0.65–0.77×, frictionloss 2.2–2.8×, the p10–p90 band of the per-episode real fits; all other
+ranges, latency included, as in `--dr full`; so-arm100-sim 552e603 or later), 3 M steps, seeds
+0–2, then evaluates both on `nominal`, `real_fit` and `laggy` (100 × 5). `dr_ab.py` pairs the
+arms by training seed (`runs/gap_ab_*.json` → `runs/dr_ab.json`), mean ± sd over the 3 training seeds:
+
+| physics | A: --dr full | B: --dr centred | B - A (paired) |
+|---|---|---|---|
+| nominal | 0.956 +- 0.054 | 0.959 +- 0.053 | +0.003 +- 0.095 |
+| real_fit | 0.951 +- 0.047 | 0.984 +- 0.023 | +0.033 +- 0.069 |
+| laggy | 0.523 +- 0.147 | 0.720 +- 0.020 | +0.197 +- 0.129 |
+| **gap: nominal - real_fit** | 0.005 +- 0.024 | -0.025 +- 0.031 | |
+
+Centring the DR on the real fit does not measurably change success on `nominal` or `real_fit`:
+both paired differences are smaller than their spread, and neither arm has a nominal − `real_fit`
+gap larger than its spread. Arm B, which never sees nominal servo physics, does not lose on it.
+The one consistent effect is on `laggy` (3-step latency, outside both arms' DR): B is ahead in all
+three seeds (+0.056, +0.224, +0.310) and far less seed-dependent (sd 0.020 vs 0.147). Why is not
+tested; a higher-friction, lower-kp servo slows the arm, which may make one extra step of lag
+matter less. Three seeds; read it as a direction, not an effect size.
 
 ### Results
 

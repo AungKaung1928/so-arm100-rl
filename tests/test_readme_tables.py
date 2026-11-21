@@ -58,4 +58,5 @@ def test_dr_vs_dr_real_table():
 
 
 def test_every_physics_table_is_checked():
-    assert len(re.findall(r"^\| physics \|", README, re.M)) == 3
+    # 3 gap tables here + the DR A/B table (tests/test_readme_dr_ab.py)
+    assert len(re.findall(r"^\| physics \|", README, re.M)) == 4

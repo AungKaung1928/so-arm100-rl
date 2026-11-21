@@ -1,0 +1,101 @@
+{
+  "ckpt": "runs/ab_centred_s0/policy.pt",
+  "task": "lift",
+  "episodes": 100,
+  "seeds": 5,
+  "cells": {
+    "nominal": {
+      "task": "lift:red",
+      "physics": "nominal",
+      "dr": null,
+      "n_episodes": 100,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "success_rate": 0.898,
+      "success_std": 0.027748873851023242,
+      "per_seed": [
+        0.87,
+        0.93,
+        0.9,
+        0.87,
+        0.92
+      ],
+      "return_mean": 8.514803290617127,
+      "steps_mean": 38.812,
+      "first_success_p50": 16.0,
+      "first_success_p90": 49.0,
+      "wall_s": 16.185347308000928,
+      "so_arm100_sim": "0.1.0",
+      "model_commit": "822c2d8f877dd166c5b7d3c9f7e3c3b6589473b7",
+      "date": "2026-11-22 02:41"
+    },
+    "real_fit": {
+      "task": "lift:red",
+      "physics": "real_fit",
+      "dr": null,
+      "n_episodes": 100,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "success_rate": 0.958,
+      "success_std": 0.013038404810405309,
+      "per_seed": [
+        0.95,
+        0.97,
+        0.94,
+        0.97,
+        0.96
+      ],
+      "return_mean": 9.100367681158506,
+      "steps_mean": 32.214,
+      "first_success_p50": 18.0,
+      "first_success_p90": 50.0,
+      "wall_s": 14.030081411998253,
+      "so_arm100_sim": "0.1.0",
+      "model_commit": "822c2d8f877dd166c5b7d3c9f7e3c3b6589473b7",
+      "date": "2026-11-22 02:41"
+    },
+    "laggy": {
+      "task": "lift:red",
+      "physics": "laggy",
+      "dr": null,
+      "n_episodes": 100,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "success_rate": 0.736,
+      "success_std": 0.04669047011971505,
+      "per_seed": [
+        0.69,
+        0.75,
+        0.72,
+        0.81,
+        0.71
+      ],
+      "return_mean": 5.276987397351616,
+      "steps_mean": 80.796,
+      "first_success_p50": 56.0,
+      "first_success_p90": 97.0,
+      "wall_s": 28.994277277997753,
+      "so_arm100_sim": "0.1.0",
+      "model_commit": "822c2d8f877dd166c5b7d3c9f7e3c3b6589473b7",
+      "date": "2026-11-22 02:41"
+    }
+  },
+  "so_arm100_sim": "0.1.0",
+  "model_commit": "822c2d8f877dd166c5b7d3c9f7e3c3b6589473b7",
+  "date": "2026-11-22 02:41"
+}
