@@ -72,7 +72,13 @@ def test_action_stats_sentence_matches_runs():
 def test_lag_failmode_sentence_matches_runs():
     d = json.load(open(os.path.join(ROOT, "runs", "lag_failmode.json")))["policies"]
     assert len(d) == 6
-    worst = max(v["grasped_not_lifted"] for v in d.values())
-    assert f"(at most {100 * worst:.0f} % of episodes for any policy" in " ".join(README.split())
-    # "that is where B is better": B's no-grasp share is lower than A's, paired by training seed
-    assert all(d[f"centred_s{s}"]["no_grasp"] < d[f"full_s{s}"]["no_grasp"] for s in (0, 1, 2))
+    text = " ".join(README.split())
+
+    def rng(arm, key):
+        v = [d[f"{arm}_s{s}"][key] for s in (0, 1, 2)]
+        return f"{100 * min(v):.0f}–{100 * max(v):.0f} %"
+    assert (f"still fail are {rng('full', 'failed_after_grasp')} for A and "
+            f"{rng('centred', 'failed_after_grasp')} for B, lower for B in every seed") in text
+    assert all(d[f"centred_s{s}"]["failed_after_grasp"] < d[f"full_s{s}"]["failed_after_grasp"] for s in (0, 1, 2))
+    assert (f"no grasp at all are {rng('full', 'failed_no_grasp')} for A and "
+            f"{rng('centred', 'failed_no_grasp')} for B") in text

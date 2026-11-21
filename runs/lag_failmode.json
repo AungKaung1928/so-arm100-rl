@@ -4,33 +4,33 @@
  "policies": {
   "full_s0": {
    "success": 0.66,
-   "grasped_not_lifted": 0.01,
-   "no_grasp": 0.33
+   "failed_after_grasp": 0.25,
+   "failed_no_grasp": 0.09
   },
   "full_s1": {
    "success": 0.52,
-   "grasped_not_lifted": 0.0,
-   "no_grasp": 0.48
+   "failed_after_grasp": 0.22,
+   "failed_no_grasp": 0.26
   },
   "full_s2": {
    "success": 0.35,
-   "grasped_not_lifted": 0.0,
-   "no_grasp": 0.65
+   "failed_after_grasp": 0.24,
+   "failed_no_grasp": 0.41
   },
   "centred_s0": {
    "success": 0.69,
-   "grasped_not_lifted": 0.0,
-   "no_grasp": 0.31
+   "failed_after_grasp": 0.18,
+   "failed_no_grasp": 0.13
   },
   "centred_s1": {
    "success": 0.69,
-   "grasped_not_lifted": 0.03,
-   "no_grasp": 0.28
+   "failed_after_grasp": 0.2,
+   "failed_no_grasp": 0.11
   },
   "centred_s2": {
    "success": 0.74,
-   "grasped_not_lifted": 0.01,
-   "no_grasp": 0.25
+   "failed_after_grasp": 0.18,
+   "failed_no_grasp": 0.08
   }
  }
 }
