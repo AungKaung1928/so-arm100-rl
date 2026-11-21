@@ -224,8 +224,18 @@ plateaued: rolling success peaked at 0.60 (at 17.2 M) against its 0.8 gate,
 so 99.7% of the budget went to push and lift was never trained. What
 failed is the gate, not the transfer: on this bench, push at 0.8 is a harder
 bar than lift at 0.6 is from scratch, so a curriculum ordered by intuition
-blocked the task it was meant to help. One seed. The next test is a lower
-push gate or a step cap per stage, not a claim that curricula cannot help.
+blocked the task it was meant to help. The 0.8 gate is also above the scripted
+expert's mean on push (0.76 ± 0.07 over 5 seeds, nominal, so-arm100-sim).
+
+A lower gate does not rescue it on steps, and that needs no training run:
+`tools/push_gate_bound.py` reads the stuck run's log (`runs/push_gate_bound.json`).
+Push's rolling success first reached 0.5 at 3,926,016 steps and 0.15 at
+1,391,616, while lift from scratch reached 0.6 at 995,992 in total. The
+curriculum cannot finish lift before it leaves push, so any push gate above
+0.1 loses on steps-to-lift for this seed; at 0.1 it promotes after 68,608
+steps, which is skipping push. One seed, and a claim about steps on `lift`
+only: it does not rule out a curriculum helping final success or a task that
+from-scratch PPO cannot learn.
 
 ```
 F="--dr none --seed 0 --target-kl 0.02 --no-terminate-on-success"
