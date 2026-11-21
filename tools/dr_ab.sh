@@ -16,6 +16,7 @@ set -u
 cd "$(dirname "$0")/.."
 PY="${PYTHON:-python3}"
 SEEDS="${SEEDS:-0 1 2}"
+ARMS="${ARMS:-full centred}"            # e.g. ARMS=both for arm C (pairs with full via dr_ab.py --b both)
 STEPS="${STEPS:-3000000}"
 CELLS="${CELLS:-nominal real_fit laggy}"
 EPISODES="${EPISODES:-100}"
@@ -30,7 +31,7 @@ quiet() {   # train.py refuses to start above load 4; wait for our own last job 
 }
 
 for s in $SEEDS; do
-  for arm in full centred; do
+  for arm in $ARMS; do
     out=runs/ab_${arm}_s$s
     if ! grep -q '"finished": true' "$out/summary.json" 2>/dev/null; then
       quiet || exit 1

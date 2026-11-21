@@ -32,3 +32,13 @@ def test_one_seed_has_zero_spread(tmp_path):
     _write(tmp_path, "centred", 9, nominal=0.6, real_fit=0.7)
     s = dr_ab.summarise(dr_ab.load(str(tmp_path)))
     assert s["cells"]["nominal"]["diff_mean_sd"] == pytest.approx((0.1, 0.0))
+
+
+def test_other_b_arm_pairs_with_full(tmp_path):
+    _write(tmp_path, "full", 0, nominal=0.90, real_fit=0.80)
+    _write(tmp_path, "centred", 0, nominal=0.10, real_fit=0.10)    # ignored when b="both"
+    _write(tmp_path, "both", 0, nominal=0.95, real_fit=0.90)
+    s = dr_ab.summarise(dr_ab.load(str(tmp_path), b="both"), b="both")
+    assert s["b"] == "both" and s["cells"]["real_fit"]["diff"] == pytest.approx([0.10])
+    t = dr_ab.table(s)
+    assert "B: --dr both" in t and "| real_fit | 0.800 +- 0.000 | 0.900 +- 0.000 | +0.100 +- 0.000 |" in t
