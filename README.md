@@ -93,7 +93,10 @@ three seeds (+0.056, +0.224, +0.310) and far less seed-dependent (sd 0.020 vs 0.
 not the slower servo at evaluation time: with the same 3-step lag on B's centre servo (kp 0.71×,
 frictionloss 2.5×; `tools/lag_servo.py` → `runs/gap_lagsoft_*.json`) arm A does not recover
 (0.455 ± 0.086) and B stays ahead in every seed (+0.175 ± 0.057). The lag tolerance is in how
-B's policy was trained. Three seeds; read it as a direction, not an effect size.
+B's policy was trained. It is not a gentler controller either: on `nominal` and `laggy` alike all
+six policies drive near bang-bang, mean |action| 0.915–0.935 with 83–87 % of action components at
+the ±1 clip, and the two arms' ranges overlap (`tools/action_stats.py` → `runs/action_stats.json`,
+50 episodes each). Three seeds; read it as a direction, not an effect size.
 
 The lead is specific to lag. The same six policies on the other held-out cells
 (`runs/gap_abx_*.json`, 100 × 5 each), paired B − A: heavy +0.022 ± 0.114, weak +0.030 ± 0.079,

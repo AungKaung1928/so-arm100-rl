@@ -1,4 +1,5 @@
 """The README DR A/B table is exactly what dr_ab.py computes from the tracked runs/gap_ab_*.json."""
+import json
 import os
 
 import dr_ab
@@ -52,3 +53,17 @@ def test_lag_servo_sentence_matches_runs(tmp_path):
     assert "B stays ahead in every seed ({:+.3f} ± {:.3f})".format(*r["diff_mean_sd"]) in text
     laggy = dr_ab.summarise(dr_ab.load(os.path.join(ROOT, "runs")))["cells"]["laggy"]
     assert r["full_mean_sd"][0] <= laggy["full_mean_sd"][0]     # "does not recover"
+
+
+def test_action_stats_sentence_matches_runs():
+    d = json.load(open(os.path.join(ROOT, "runs", "action_stats.json")))["policies"]
+    assert len(d) == 12      # 2 physics x 2 arms x 3 seeds
+    mag = [v["mean_abs_action"] for v in d.values()]
+    sat = [v["saturated_share"] for v in d.values()]
+    text = " ".join(README.split())
+    assert f"mean |action| {min(mag):.3f}–{max(mag):.3f} with {100 * min(sat):.0f}–{100 * max(sat):.0f} %" in text
+    for key in ("mean_abs_action", "saturated_share", "mean_abs_delta"):     # "the two arms' ranges overlap"
+        for phys in ("nominal", "laggy"):
+            a = [v[key] for k, v in d.items() if k.startswith(f"{phys}/full_")]
+            b = [v[key] for k, v in d.items() if k.startswith(f"{phys}/centred_")]
+            assert min(a) <= max(b) and min(b) <= max(a), (key, phys)

@@ -1,0 +1,77 @@
+{
+ "episodes": 50,
+ "policies": {
+  "nominal/full_s0": {
+   "mean_abs_action": 0.9232970476150513,
+   "mean_abs_delta": 0.30115583539009094,
+   "saturated_share": 0.8466198979591837,
+   "steps": 1568
+  },
+  "nominal/full_s1": {
+   "mean_abs_action": 0.9303887486457825,
+   "mean_abs_delta": 0.26293614506721497,
+   "saturated_share": 0.8608855375096673,
+   "steps": 1724
+  },
+  "nominal/full_s2": {
+   "mean_abs_action": 0.9152255654335022,
+   "mean_abs_delta": 0.3255248963832855,
+   "saturated_share": 0.8286028045277919,
+   "steps": 1973
+  },
+  "nominal/centred_s0": {
+   "mean_abs_action": 0.9176642894744873,
+   "mean_abs_delta": 0.30378013849258423,
+   "saturated_share": 0.8355600539811064,
+   "steps": 2470
+  },
+  "nominal/centred_s1": {
+   "mean_abs_action": 0.9154472947120667,
+   "mean_abs_delta": 0.33479779958724976,
+   "saturated_share": 0.8325082508250825,
+   "steps": 1616
+  },
+  "nominal/centred_s2": {
+   "mean_abs_action": 0.9207818508148193,
+   "mean_abs_delta": 0.3286466598510742,
+   "saturated_share": 0.8442115768463073,
+   "steps": 1670
+  },
+  "laggy/full_s0": {
+   "mean_abs_action": 0.9349556565284729,
+   "mean_abs_delta": 0.16190101206302643,
+   "saturated_share": 0.8700812238782429,
+   "steps": 4227
+  },
+  "laggy/full_s1": {
+   "mean_abs_action": 0.9276586174964905,
+   "mean_abs_delta": 0.15629898011684418,
+   "saturated_share": 0.8571927618249143,
+   "steps": 4771
+  },
+  "laggy/full_s2": {
+   "mean_abs_action": 0.9352771043777466,
+   "mean_abs_delta": 0.16480949521064758,
+   "saturated_share": 0.8732945242859742,
+   "steps": 5497
+  },
+  "laggy/centred_s0": {
+   "mean_abs_action": 0.925495445728302,
+   "mean_abs_delta": 0.15432491898536682,
+   "saturated_share": 0.8484189149985494,
+   "steps": 4596
+  },
+  "laggy/centred_s1": {
+   "mean_abs_action": 0.9283663034439087,
+   "mean_abs_delta": 0.16526195406913757,
+   "saturated_share": 0.8596373903997622,
+   "steps": 4486
+  },
+  "laggy/centred_s2": {
+   "mean_abs_action": 0.9290831685066223,
+   "mean_abs_delta": 0.1745937019586563,
+   "saturated_share": 0.8608200455580866,
+   "steps": 4390
+  }
+ }
+}
