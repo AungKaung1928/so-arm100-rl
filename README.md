@@ -89,9 +89,11 @@ Centring the DR on the real fit does not measurably change success on `nominal` 
 both paired differences are smaller than their spread, and neither arm has a nominal − `real_fit`
 gap larger than its spread. Arm B, which never sees nominal servo physics, does not lose on it.
 The one consistent effect is on `laggy` (3-step latency, outside both arms' DR): B is ahead in all
-three seeds (+0.056, +0.224, +0.310) and far less seed-dependent (sd 0.020 vs 0.147). Why is not
-tested; a higher-friction, lower-kp servo slows the arm, which may make one extra step of lag
-matter less. Three seeds; read it as a direction, not an effect size.
+three seeds (+0.056, +0.224, +0.310) and far less seed-dependent (sd 0.020 vs 0.147). It is
+not the slower servo at evaluation time: with the same 3-step lag on B's centre servo (kp 0.71×,
+frictionloss 2.5×; `tools/lag_servo.py` → `runs/gap_lagsoft_*.json`) arm A does not recover
+(0.455 ± 0.086) and B stays ahead in every seed (+0.175 ± 0.057). The lag tolerance is in how
+B's policy was trained. Three seeds; read it as a direction, not an effect size.
 
 The lead is specific to lag. The same six policies on the other held-out cells
 (`runs/gap_abx_*.json`, 100 × 5 each), paired B − A: heavy +0.022 ± 0.114, weak +0.030 ± 0.079,

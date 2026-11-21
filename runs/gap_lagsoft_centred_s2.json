@@ -1,0 +1,43 @@
+{
+  "cells": {
+    "lagsoft": {
+      "task": "lift:red",
+      "physics": {
+        "latency": 3,
+        "kp": 0.71,
+        "frictionloss": 2.5
+      },
+      "dr": null,
+      "n_episodes": 100,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "success_rate": 0.612,
+      "success_std": 0.03898717737923585,
+      "per_seed": [
+        0.6,
+        0.64,
+        0.66,
+        0.56,
+        0.6
+      ],
+      "return_mean": 2.4995082840604144,
+      "steps_mean": 95.474,
+      "first_success_p50": 57.0,
+      "first_success_p90": 107.5,
+      "wall_s": 21.616293230996234,
+      "so_arm100_sim": "0.1.0",
+      "model_commit": "822c2d8f877dd166c5b7d3c9f7e3c3b6589473b7",
+      "date": "2026-11-22 05:38"
+    }
+  },
+  "cell": {
+    "latency": 3,
+    "kp": 0.71,
+    "frictionloss": 2.5
+  }
+}

@@ -38,3 +38,17 @@ def test_other_cells_sentence_matches_runs(tmp_path):
         assert abs(m) < sd and not all(d > 0 for d in s["cells"][c]["diff"]), c
     # slippery is inert: identical to nominal for every policy
     assert s["cells"]["slippery"]["diff"] == dr_ab.summarise(dr_ab.load(os.path.join(ROOT, "runs")))["cells"]["nominal"]["diff"]
+
+
+def test_lag_servo_sentence_matches_runs(tmp_path):
+    for f in os.listdir(os.path.join(ROOT, "runs")):
+        if f.startswith("gap_lagsoft_"):
+            (tmp_path / f.replace("gap_lagsoft_", "gap_ab_")).symlink_to(os.path.join(ROOT, "runs", f))
+    s = dr_ab.summarise(dr_ab.load(str(tmp_path)))
+    r = s["cells"]["lagsoft"]
+    assert s["train_seeds"] == [0, 1, 2] and all(d > 0 for d in r["diff"])
+    text = " ".join(README.split())
+    assert "arm A does not recover ({:.3f} ± {:.3f})".format(*r["full_mean_sd"]) in text
+    assert "B stays ahead in every seed ({:+.3f} ± {:.3f})".format(*r["diff_mean_sd"]) in text
+    laggy = dr_ab.summarise(dr_ab.load(os.path.join(ROOT, "runs")))["cells"]["laggy"]
+    assert r["full_mean_sd"][0] <= laggy["full_mean_sd"][0]     # "does not recover"
