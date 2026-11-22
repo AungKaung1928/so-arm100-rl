@@ -20,7 +20,7 @@ Linux, Python 3.11+ (onnxruntime 1.30 has no 3.10 wheel; Ubuntu: the `python3-ve
 git clone <this repo URL>
 cd so-arm100-rl
 python3 -m venv .venv && . .venv/bin/activate                       # first time only
-pip install torch --index-url https://download.pytorch.org/whl/cpu   # first time only
+pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cpu   # first time only
 pip install -r requirements.txt && pip install -e .                 # first time only, pulls the bench from its tag
 python -m pytest -q tests                                           # README numbers vs runs/*.json + env and PPO tests
 ```
