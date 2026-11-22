@@ -57,3 +57,10 @@ def test_results_rows_match_saved_runs():
     pg = json.load(open(os.path.join(ROOT, "runs", "push_gate_bound.json")))
     assert (f"| PPO, lift from scratch, nominal | steps to lift ≥ 0.6 (rolling 100) | "
             f"{pg['from_scratch_steps_to_lift'] / 1e6:.3f} M |") in details
+    lines = details.splitlines()
+    assert any(l.startswith(f"| from scratch | {pg['from_scratch_steps_to_lift'] / 1e6:.3f} M |") for l in lines)
+    # the held-out gap table appears twice (results + write-up); both copies end on this row
+    held = [k for k in a["cells"] if k in b["cells"] and k not in ("nominal", "dr")]
+    da, db, dd = _last_row(table(a, b))[1:]
+    row = f"| **mean drop vs own nominal** ({len(held)} held-out cells) | {da} | {db} | {dd.replace('-', '−')} |"
+    assert lines.count(row) == 2, row
