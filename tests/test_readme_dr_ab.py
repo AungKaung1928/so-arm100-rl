@@ -96,3 +96,23 @@ def test_grasp_contact_sentence_matches_runs():
                                f"{d[f'full_s{k}']['grasp_losses']})") in text
     lo = min(v["losses_on_table"] for v in d.values()); hi = max(v["losses_on_table"] for v in d.values())
     assert f"{100 * lo:.0f}–{100 * hi:.0f} % of losses with the cube still on the table" in text
+
+
+def test_arm_c_table_matches_runs():
+    """Arm C (--dr both): DETAILS table and every-seed claims vs the per-seed runs and runs/dr_ab_both.json."""
+    s = dr_ab.summarise(dr_ab.load(os.path.join(ROOT, "runs"), "both", ("gap_ab", "gap_abx")), "both")
+    assert s["train_seeds"] == [0, 1, 2]
+    saved = json.load(open(os.path.join(ROOT, "runs", "dr_ab_both.json")))
+    assert saved["train_seeds"] == s["train_seeds"] and saved["cells"].keys() == s["cells"].keys()
+    for c in s["cells"]:
+        assert saved["cells"][c]["diff"] == s["cells"][c]["diff"], c
+    for line in dr_ab.table(s).splitlines():
+        assert line in README, line
+    for c in ("nominal", "real_fit"):        # "behind A in every one of the 3 seeds ... by more than the spread"
+        m, sd = s["cells"][c]["diff_mean_sd"]
+        assert all(d < 0 for d in s["cells"][c]["diff"]) and -m > sd, c
+    lag = s["cells"]["laggy"]
+    assert sum(d > 0 for d in lag["diff"]) == 2       # "in two seeds of three"
+    assert f"(seed {lag['diff'].index(min(lag['diff']))}: {min(lag['diff']):+.3f})" in README
+    m, sd = s["cells"]["weak"]["diff_mean_sd"]
+    assert abs(m) < sd

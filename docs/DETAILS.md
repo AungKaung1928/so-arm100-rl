@@ -108,6 +108,23 @@ The lead is specific to lag. The same eight policies on the other held-out cells
 noisy +0.048 ± 0.092, small +0.065 ± 0.110, each smaller than its spread and none with B ahead in
 all four seeds. `slippery` is left out: it is inert (see below) and repeats `nominal`.
 
+Arm C, `--dr both` (`DRConfig.real_both()`: kp 0.38–0.77×, frictionloss 1.7–2.8×, spanning the
+per-episode fits of both real SO-100 datasets; so-arm100-sim aa9dcc6 or later), same recipe, 3 M
+steps, training seeds 0–2 only, against arm A on the same seeds (`python dr_ab.py --b both --prefix
+gap_ab gap_abx` → `runs/dr_ab_both.json`; `weak`, kp 0.45×, is inside C's range, not held out):
+
+| physics | A: --dr full | B: --dr both | B - A (paired) |
+|---|---|---|---|
+| nominal | 0.956 +- 0.054 | 0.862 +- 0.099 | -0.094 +- 0.050 |
+| real_fit | 0.951 +- 0.047 | 0.905 +- 0.069 | -0.046 +- 0.029 |
+| laggy | 0.523 +- 0.147 | 0.702 +- 0.067 | +0.179 +- 0.157 |
+| weak | 0.941 +- 0.047 | 0.926 +- 0.016 | -0.015 +- 0.038 |
+| **gap: nominal - real_fit** | 0.005 +- 0.024 | -0.043 +- 0.035 | |
+
+Widening the servo range to cover both datasets costs success on `nominal` and `real_fit`: C is
+behind A in every one of the 3 seeds on both cells, by more than the spread. C leads on `laggy`
+in two seeds of three (seed 0: -0.002), and `weak` is a tie despite being in C's training range. Three seeds; the arm B result above does not carry over to the wider range.
+
 ### Results
 
 | method | metric | value | condition |
