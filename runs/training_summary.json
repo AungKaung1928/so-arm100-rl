@@ -1,0 +1,35 @@
+{
+ "lift_scr_nominal": {
+  "steps": 20000768,
+  "chunk_env_steps_per_s": [
+   3043.1470020073957,
+   2424.7823161785464
+  ],
+  "chunk_split_step": 10000384
+ },
+ "lift_scr_dr_stalled": {
+  "last_step": 4890624,
+  "max_rolling_success": 0.09
+ },
+ "lift_ft_dr": {
+  "steps": 10000384,
+  "env_steps_per_s_mean": 2545.9025607992717
+ },
+ "lift_cur_nominal": {
+  "steps": 20000768,
+  "final_stage": "push",
+  "transitions": [
+   [
+    54392,
+    "reach",
+    "push",
+    0.8
+   ]
+  ],
+  "final_eval_success": 0.45,
+  "stages_seen": [
+   "push",
+   "reach"
+  ]
+ }
+}

@@ -24,7 +24,7 @@ cd so-arm100-rl
 python3 -m venv .venv && . .venv/bin/activate                       # first time only
 pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cpu   # first time only
 pip install -r requirements.txt && pip install -e .                 # first time only, pulls the bench at a pinned commit
-python -m pytest -q tests      # 50 passed, 1 skipped (plot test needs matplotlib) in ~40 s: README numbers vs runs/*.json, env and PPO tests
+python -m pytest -q tests      # 53 passed, 1 skipped (plot test needs matplotlib) in ~40 s: README numbers vs runs/*.json, env and PPO tests
 ```
 
 Training, evaluation, ONNX export and Docker: [docs/DETAILS.md#reproducing](docs/DETAILS.md#reproducing).
