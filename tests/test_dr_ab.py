@@ -42,3 +42,21 @@ def test_other_b_arm_pairs_with_full(tmp_path):
     assert s["b"] == "both" and s["cells"]["real_fit"]["diff"] == pytest.approx([0.10])
     t = dr_ab.table(s)
     assert "B: --dr both" in t and "| real_fit | 0.800 +- 0.000 | 0.900 +- 0.000 | +0.100 +- 0.000 |" in t
+
+
+def test_prefixes_merge_cells_and_dropped_cells_are_listed(tmp_path):
+    for arm in ("full", "both"):
+        _write(tmp_path, arm, 0, nominal=0.9, real_fit=0.8)
+    (tmp_path / "gap_abx_full_s0.json").write_text(json.dumps({"cells": {"weak": {"success_rate": 0.5}}}))
+    _write(tmp_path, "both", 0, nominal=0.9, real_fit=0.8, weak=0.7)
+    s = dr_ab.summarise(dr_ab.load(str(tmp_path), b="both"), b="both")
+    assert "weak" not in s["cells"] and s["dropped_cells"] == ["weak"]
+    s = dr_ab.summarise(dr_ab.load(str(tmp_path), b="both", prefixes=("gap_ab", "gap_abx")), b="both")
+    assert s["cells"]["weak"]["diff"] == pytest.approx([0.2]) and s["dropped_cells"] == []
+
+
+def test_prefixes_refuse_different_checkpoints(tmp_path):
+    for prefix, ckpt in (("gap_ab", "a.pt"), ("gap_abx", "b.pt")):
+        (tmp_path / f"{prefix}_full_s0.json").write_text(json.dumps({"ckpt": ckpt, "cells": {}}))
+    with pytest.raises(ValueError):
+        dr_ab.load(str(tmp_path), prefixes=("gap_ab", "gap_abx"))

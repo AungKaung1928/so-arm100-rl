@@ -26,11 +26,8 @@ def test_laggy_claim_matches_runs():
         assert abs(m) < sd, c
 
 
-def test_other_cells_sentence_matches_runs(tmp_path):
-    for f in os.listdir(os.path.join(ROOT, "runs")):     # gap_abx_* -> gap_ab_* so dr_ab.load pairs them
-        if f.startswith("gap_abx_"):
-            (tmp_path / f.replace("gap_abx_", "gap_ab_")).symlink_to(os.path.join(ROOT, "runs", f))
-    s = dr_ab.summarise(dr_ab.load(str(tmp_path)))
+def test_other_cells_sentence_matches_runs():
+    s = dr_ab.summarise(dr_ab.load(os.path.join(ROOT, "runs"), prefixes=("gap_abx",)))
     assert s["train_seeds"] == [0, 1, 2]
     text = " ".join(README.split())
     for c in ("heavy", "weak", "noisy", "small"):
@@ -41,11 +38,8 @@ def test_other_cells_sentence_matches_runs(tmp_path):
     assert s["cells"]["slippery"]["diff"] == dr_ab.summarise(dr_ab.load(os.path.join(ROOT, "runs")))["cells"]["nominal"]["diff"]
 
 
-def test_lag_servo_sentence_matches_runs(tmp_path):
-    for f in os.listdir(os.path.join(ROOT, "runs")):
-        if f.startswith("gap_lagsoft_"):
-            (tmp_path / f.replace("gap_lagsoft_", "gap_ab_")).symlink_to(os.path.join(ROOT, "runs", f))
-    s = dr_ab.summarise(dr_ab.load(str(tmp_path)))
+def test_lag_servo_sentence_matches_runs():
+    s = dr_ab.summarise(dr_ab.load(os.path.join(ROOT, "runs"), prefixes=("gap_lagsoft",)))
     r = s["cells"]["lagsoft"]
     assert s["train_seeds"] == [0, 1, 2] and all(d > 0 for d in r["diff"])
     text = " ".join(README.split())

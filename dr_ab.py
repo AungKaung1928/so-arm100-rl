@@ -8,6 +8,7 @@ deviation over training seeds; with fewer than 3 seeds read the per-seed rows, n
 
     python dr_ab.py            # prints the table, writes runs/dr_ab.json
     python dr_ab.py --b both   # arm C vs A, writes runs/dr_ab_both.json
+    python dr_ab.py --b both --prefix gap_ab gap_abx   # arm A's weak/heavy/... cells come from gap_abx
 """
 import argparse
 import glob
@@ -16,14 +17,25 @@ import re
 import statistics
 
 
-def load(runs="runs", b="centred"):
-    """{seed: {arm: eval_gap result}} for seeds where both arm A (full) and arm b exist."""
+def load(runs="runs", b="centred", prefixes=("gap_ab",)):
+    """{seed: {arm: eval_gap result}} for seeds where both arm A (full) and arm b exist.
+
+    Each prefix is one eval file per arm and seed (e.g. gap_ab, gap_abx); their cells are merged, and
+    files merged for one arm and seed must come from the same checkpoint."""
     by_seed = {}
-    for arm in ("full", b):
-        for path in glob.glob(f"{runs}/gap_ab_{arm}_s*.json"):
-            seed = int(re.search(r"_s(\d+)\.json$", path).group(1))
-            with open(path) as fh:
-                by_seed.setdefault(seed, {})[arm] = json.load(fh)
+    for prefix in prefixes:
+        for arm in ("full", b):
+            for path in glob.glob(f"{runs}/{prefix}_{arm}_s*.json"):
+                seed = int(re.search(r"_s(\d+)\.json$", path).group(1))
+                with open(path) as fh:
+                    r = json.load(fh)
+                have = by_seed.setdefault(seed, {}).get(arm)
+                if have is None:
+                    by_seed[seed][arm] = r
+                    continue
+                if have.get("ckpt") != r.get("ckpt"):
+                    raise ValueError(f"{path}: ckpt {r.get('ckpt')} != {have.get('ckpt')}")
+                have["cells"] = {**have["cells"], **r["cells"]}
     return {s: r for s, r in sorted(by_seed.items()) if len(r) == 2}
 
 
@@ -35,7 +47,8 @@ def summarise(by_seed, b="centred"):
     seeds = list(by_seed)
     cells = [c for c in by_seed[seeds[0]]["full"]["cells"] if all(c in r[a]["cells"] for r in by_seed.values() for a in r)]
     rate = {a: {c: [by_seed[s][a]["cells"][c]["success_rate"] for s in seeds] for c in cells} for a in ("full", b)}
-    out = {"train_seeds": seeds, "b": b, "cells": {}}
+    every = {c for r in by_seed.values() for a in r for c in r[a]["cells"]}
+    out = {"train_seeds": seeds, "b": b, "cells": {}, "dropped_cells": sorted(every - set(cells))}
     for c in cells:
         diff = [y - x for x, y in zip(rate["full"][c], rate[b][c])]
         out["cells"][c] = {"full": rate["full"][c], b: rate[b][c], "diff": diff,
@@ -64,13 +77,16 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("runs", nargs="?", default="runs")
     ap.add_argument("--b", default="centred", help="arm compared with --dr full")
+    ap.add_argument("--prefix", nargs="+", default=["gap_ab"], help="eval files merged per arm and seed")
     a = ap.parse_args()
-    by_seed = load(a.runs, a.b)
+    by_seed = load(a.runs, a.b, a.prefix)
     if not by_seed:
         raise SystemExit(f"no seed with both arms in {a.runs}/ (run tools/dr_ab.sh first)")
     s = summarise(by_seed, a.b)
     print(f"training seeds {s['train_seeds']}; mean +- sd over training seeds\n")
     print(table(s))
+    if s["dropped_cells"]:
+        print(f"\nnot in every arm and seed, left out: {', '.join(s['dropped_cells'])}")
     name = "dr_ab.json" if a.b == "centred" else f"dr_ab_{a.b}.json"
     with open(f"{a.runs}/{name}", "w") as fh:
         json.dump(s, fh, indent=1)
