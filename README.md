@@ -14,7 +14,7 @@ The curriculum never reached lift, DR from scratch stalled, and every number is 
 
 ## Quick start
 
-Linux, Python 3.10+ (Ubuntu: the `python3-venv` package), CPU only.
+Linux, Python 3.11+ (onnxruntime 1.30 has no 3.10 wheel; Ubuntu: the `python3-venv` package), CPU only.
 
 ```bash
 git clone <this repo URL>
