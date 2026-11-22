@@ -46,3 +46,14 @@ def test_realfit_runs_match_readme_sentence():
     assert n["nominal"]["success_rate"] == 0.998 and "reproduce 0.998 exactly" in readme
     cost = max(r["nominal"]["success_rate"] - r["real_fit"]["success_rate"] for r in (n, d))
     assert f"at most {cost:.3f}" in readme
+
+
+def test_results_rows_match_saved_runs():
+    details = open(os.path.join(ROOT, "docs", "DETAILS.md")).read()
+    a, b = (json.load(open(os.path.join(ROOT, "runs", f))) for f in ("gap_nominal.json", "gap_dr.json"))
+    drop_a, drop_b = _last_row(table(a, b))[1:3]
+    assert f"| nominal-trained policy | mean drop vs own nominal | {drop_a} |" in details
+    assert f"| DR fine-tuned policy (+10 M steps) | mean drop vs own nominal | {drop_b} |" in details
+    pg = json.load(open(os.path.join(ROOT, "runs", "push_gate_bound.json")))
+    assert (f"| PPO, lift from scratch, nominal | steps to lift ≥ 0.6 (rolling 100) | "
+            f"{pg['from_scratch_steps_to_lift'] / 1e6:.3f} M |") in details
