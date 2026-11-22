@@ -3,7 +3,7 @@ import json
 import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-README = open(os.path.join(ROOT, "README.md")).read()
+README = open(os.path.join(ROOT, "docs", "DETAILS.md")).read()
 O = json.load(open(os.path.join(ROOT, "runs", "onnx.json")))
 LAT = f"{O['latency']['p50_ms']:.3f} / {O['latency']['p99_ms']:.3f}"
 DIFF = f"{O['max_abs_diff']:.1e}".replace("e-0", "e-")

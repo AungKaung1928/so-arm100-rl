@@ -5,7 +5,7 @@ import os
 import dr_ab
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-README = open(os.path.join(ROOT, "README.md")).read()
+README = open(os.path.join(ROOT, "docs", "DETAILS.md")).read()
 
 
 def test_dr_ab_table_matches_runs():

@@ -3,7 +3,7 @@ import json
 import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-README = " ".join(open(os.path.join(ROOT, "README.md")).read().split())
+README = " ".join(open(os.path.join(ROOT, "docs", "DETAILS.md")).read().split())
 B = json.load(open(os.path.join(ROOT, "runs", "push_gate_bound.json")))
 
 

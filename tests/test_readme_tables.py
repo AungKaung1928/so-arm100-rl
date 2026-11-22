@@ -4,7 +4,7 @@ import os
 import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-README = open(os.path.join(ROOT, "README.md")).read()
+README = open(os.path.join(ROOT, "docs", "DETAILS.md")).read()
 
 
 def _cells(*names):
