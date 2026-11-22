@@ -76,21 +76,22 @@ recipe, arm A under `--dr full` and arm B under `--dr centred` (`DRConfig.real_c
 kp 0.65–0.77×, frictionloss 2.2–2.8×, the p10–p90 band of the per-episode real fits on one
 pick-place dataset, which a second SO-100 dataset's fitted kp falls outside, see so-arm100-sim; all other
 ranges, latency included, as in `--dr full`; so-arm100-sim 552e603 or later), 3 M steps, seeds
-0–2, then evaluates both on `nominal`, `real_fit` and `laggy` (100 × 5). `dr_ab.py` pairs the
-arms by training seed (`runs/gap_ab_*.json` → `runs/dr_ab.json`), mean ± sd over the 3 training seeds:
+0–3, then evaluates both on `nominal`, `real_fit` and `laggy` (100 × 5). `dr_ab.py` pairs the
+arms by training seed (`runs/gap_ab_*.json` → `runs/dr_ab.json`), mean ± sd over the 4 training seeds:
 
 | physics | A: --dr full | B: --dr centred | B - A (paired) |
 |---|---|---|---|
-| nominal | 0.956 +- 0.054 | 0.959 +- 0.053 | +0.003 +- 0.095 |
-| real_fit | 0.951 +- 0.047 | 0.984 +- 0.023 | +0.033 +- 0.069 |
-| laggy | 0.523 +- 0.147 | 0.720 +- 0.020 | +0.197 +- 0.129 |
-| **gap: nominal - real_fit** | 0.005 +- 0.024 | -0.025 +- 0.031 | |
+| nominal | 0.949 +- 0.047 | 0.965 +- 0.045 | +0.017 +- 0.082 |
+| real_fit | 0.949 +- 0.039 | 0.987 +- 0.019 | +0.039 +- 0.058 |
+| laggy | 0.521 +- 0.120 | 0.748 +- 0.058 | +0.227 +- 0.122 |
+| **gap: nominal - real_fit** | 0.000 +- 0.022 | -0.022 +- 0.026 | |
 
 Centring the DR on the real fit does not measurably change success on `nominal` or `real_fit`:
 both paired differences are smaller than their spread, and neither arm has a nominal − `real_fit`
 gap larger than its spread. Arm B, which never sees nominal servo physics, does not lose on it.
 The one consistent effect is on `laggy` (3-step latency, outside both arms' DR): B is ahead in all
-three seeds (+0.056, +0.224, +0.310) and far less seed-dependent (sd 0.020 vs 0.147). It is
+four seeds (+0.056, +0.224, +0.310, +0.318) and half as seed-dependent (sd 0.058 vs 0.120). The
+analyses below ran on seeds 0–2 only. It is
 not the slower servo at evaluation time: with the same 3-step lag on B's centre servo (kp 0.71×,
 frictionloss 2.5×; `tools/lag_servo.py` → `runs/gap_lagsoft_*.json`) arm A does not recover
 (0.455 ± 0.086) and B stays ahead in every seed (+0.175 ± 0.057). The lag tolerance is in how
@@ -105,12 +106,12 @@ seed-to-seed spread. B does not hold the cube better: it makes more grasp contac
 onsets per 100 episodes against 93–144 for A, more in every seed) and loses more of them
 (84–111 against 58–77), 60–78 % of losses with the cube still on the table. That fits a policy
 that tries again after losing contact; the flag also counts brief contacts, so this is a reading
-of the counts, not a measured mechanism. Three seeds; read it as a direction, not an effect size.
+of the counts, not a measured mechanism. Three or four seeds; read it as a direction, not an effect size.
 
-The lead is specific to lag. The same six policies on the other held-out cells
-(`runs/gap_abx_*.json`, 100 × 5 each), paired B − A: heavy +0.022 ± 0.114, weak +0.030 ± 0.079,
-noisy +0.037 ± 0.110, small +0.018 ± 0.071, each smaller than its spread and none with B ahead in
-all three seeds. `slippery` is left out: it is inert (see below) and repeats `nominal`.
+The lead is specific to lag. The same eight policies on the other held-out cells
+(`runs/gap_abx_*.json`, 100 × 5 each), paired B − A: heavy +0.037 ± 0.098, weak +0.032 ± 0.065,
+noisy +0.048 ± 0.092, small +0.065 ± 0.110, each smaller than its spread and none with B ahead in
+all four seeds. `slippery` is left out: it is inert (see below) and repeats `nominal`.
 
 ### Results
 

@@ -10,7 +10,7 @@ README = open(os.path.join(ROOT, "README.md")).read()
 
 def test_dr_ab_table_matches_runs():
     s = dr_ab.summarise(dr_ab.load(os.path.join(ROOT, "runs")))
-    assert s["train_seeds"] == [0, 1, 2]
+    assert s["train_seeds"] == [0, 1, 2, 3]
     for line in dr_ab.table(s).splitlines():
         assert line in README, line
 
@@ -28,7 +28,7 @@ def test_laggy_claim_matches_runs():
 
 def test_other_cells_sentence_matches_runs():
     s = dr_ab.summarise(dr_ab.load(os.path.join(ROOT, "runs"), prefixes=("gap_abx",)))
-    assert s["train_seeds"] == [0, 1, 2]
+    assert s["train_seeds"] == [0, 1, 2, 3]
     text = " ".join(README.split())
     for c in ("heavy", "weak", "noisy", "small"):
         m, sd = s["cells"][c]["diff_mean_sd"]
