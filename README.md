@@ -2,6 +2,8 @@
 
 PPO for the SO-ARM100 lift task on [so-arm100-sim](https://github.com/AungKaung1928/so-arm100-sim), CPU only, scored on physics it never trained on: a domain-randomised fine-tune halves the mean held-out drop (0.120 → 0.056), and DR centred on real-arm fits leads under 3-step lag in all four seeds (+0.227 ± 0.122).
 
+<img src="docs/media/dr_ab.png" width="720" alt="DR A/B over 4 training seeds: lift success per seed for --dr full and --dr centred on nominal, real_fit and laggy physics. The arms tie on nominal and real_fit; on laggy centred is ahead in every seed, +0.227 ± 0.122.">
+
 | method | metric | value | condition |
 |---|---|---|---|
 | PPO, lift from scratch, nominal | steps to lift ≥ 0.6 (rolling 100) | 0.996 M | seed 0; final eval 1.00 over 20 episodes |

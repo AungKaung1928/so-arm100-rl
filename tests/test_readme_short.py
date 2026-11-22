@@ -19,3 +19,17 @@ def test_short_numbers_in_details():
         assert n in SHORT, n
     assert "| laggy | 0.521 +- 0.120 | 0.748 +- 0.058 | +0.227 +- 0.122 |" in DETAILS
     assert "0.120 → 0.056" in flat and "all four seeds" in flat
+
+
+def test_dr_ab_plot_rebuilds_from_runs(tmp_path):
+    import subprocess
+    import sys
+
+    import pytest
+    assert '<img src="docs/media/dr_ab.png"' in SHORT
+    assert os.path.exists(os.path.join(ROOT, "docs", "media", "dr_ab.png"))
+    pytest.importorskip("matplotlib")
+    out = tmp_path / "dr_ab.png"
+    subprocess.run([sys.executable, os.path.join(ROOT, "tools", "plot_dr_ab.py"),
+                    os.path.join(ROOT, "runs", "dr_ab.json"), str(out)], check=True)
+    assert out.stat().st_size > 10_000
