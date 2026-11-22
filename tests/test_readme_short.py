@@ -17,6 +17,14 @@ def test_short_numbers_in_details():
     flat = " ".join(DETAILS.split())
     for n in ("0.120 → 0.056", "+0.227 ± 0.122", "all four seeds"):
         assert n in SHORT, n
+    # the headline and the plot's alt text each carry the laggy lead: check both lines, not one substring
+    import json
+    lag = json.load(open(os.path.join(ROOT, "runs", "dr_ab.json")))["cells"]["laggy"]
+    lead = "+{:.3f} ± {:.3f}".format(*lag["diff_mean_sd"])
+    head = [l for l in SHORT.splitlines() if l.startswith("PPO for")]
+    alt = [l for l in SHORT.splitlines() if l.startswith("<img")]
+    assert len(head) == 1 and lead in head[0] and len(lag["diff"]) == 4 and min(lag["diff"]) > 0
+    assert len(alt) == 1 and lead in alt[0] and "4 training seeds" in alt[0]
     assert "| laggy | 0.521 +- 0.120 | 0.748 +- 0.058 | +0.227 +- 0.122 |" in DETAILS
     assert "0.120 → 0.056" in flat and "all four seeds" in flat
 
