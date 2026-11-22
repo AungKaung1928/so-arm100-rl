@@ -86,22 +86,22 @@ both paired differences are smaller than their spread, and neither arm has a nom
 gap larger than its spread. Arm B, which never sees nominal servo physics, does not lose on it.
 The one consistent effect is on `laggy` (3-step latency, outside both arms' DR): B is ahead in all
 four seeds (+0.056, +0.224, +0.310, +0.318) and half as seed-dependent (sd 0.058 vs 0.120). The
-analyses below ran on seeds 0–2 only. It is
+analyses below cover the same four seeds. It is
 not the slower servo at evaluation time: with the same 3-step lag on B's centre servo (kp 0.71×,
 frictionloss 2.5×; `tools/lag_servo.py` → `runs/gap_lagsoft_*.json`) arm A does not recover
-(0.455 ± 0.086) and B stays ahead in every seed (+0.175 ± 0.057). The lag tolerance is in how
+(0.451 ± 0.070) and B stays ahead in every seed (+0.225 ± 0.110). The lag tolerance is in how
 B's policy was trained. It is not a gentler controller either: on `nominal` and `laggy` alike all
-six policies drive near bang-bang, mean |action| 0.915–0.935 with 83–87 % of action components at
+eight policies drive near bang-bang, mean |action| 0.900–0.939 with 81–88 % of action components at
 the ±1 clip, and the two arms' ranges overlap (`tools/action_stats.py` → `runs/action_stats.json`,
 50 episodes each). Under lag both kinds of failure occur (`tools/lag_failmode.py` →
 `runs/lag_failmode.json`, per-step `grasped` flag, 100 episodes per policy): episodes that grasp
-the cube at some step and still fail are 22–25 % for A and 18–20 % for B, lower for B in every
-seed; episodes with no grasp at all are 9–41 % for A and 8–13 % for B, and carry most of A's
-seed-to-seed spread. B does not hold the cube better: it makes more grasp contacts (159–180
-onsets per 100 episodes against 93–144 for A, more in every seed) and loses more of them
-(84–111 against 58–77), 60–78 % of losses with the cube still on the table. That fits a policy
+the cube at some step and still fail are 22–26 % for A and 7–20 % for B, lower for B in every
+seed; episodes with no grasp at all are 9–41 % for A and 4–13 % for B, and carry most of A's
+seed-to-seed spread. B does not hold the cube better: it makes more grasp contacts (149–180
+onsets per 100 episodes against 93–144 for A, more in every seed) and loses more of them in three
+of four seeds (59–111 against 58–77; seed 3: 59 against 61), 56–78 % of losses with the cube still on the table. That fits a policy
 that tries again after losing contact; the flag also counts brief contacts, so this is a reading
-of the counts, not a measured mechanism. Three or four seeds; read it as a direction, not an effect size.
+of the counts, not a measured mechanism. Four seeds; read it as a direction, not an effect size.
 
 The lead is specific to lag. The same eight policies on the other held-out cells
 (`runs/gap_abx_*.json`, 100 × 5 each), paired B − A: heavy +0.037 ± 0.098, weak +0.032 ± 0.065,

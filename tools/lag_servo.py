@@ -1,6 +1,6 @@
 """Is the DR A/B 'laggy' lead an eval-time servo effect or a trained-policy effect?
 
-Evaluates the six A/B policies (runs/ab_{full,centred}_s{0,1,2}) on one extra cell: 3-step latency (as
+Evaluates the eight A/B policies (runs/ab_{full,centred}_s{0,1,2,3}) on one extra cell: 3-step latency (as
 `laggy`) with the servo at the centre of --dr centred (kp 0.71x, frictionloss 2.5x). If arm A recovers there,
 a slow servo absorbs the lag at evaluation time; if not, the lead comes from how B was trained.
 
@@ -17,7 +17,7 @@ from so_arm100_rl.ppo import FrozenPolicy               # noqa: E402
 
 CELL = {"latency": 3, "kp": 0.71, "frictionloss": 2.5}
 
-for seed in (0, 1, 2):
+for seed in (0, 1, 2, 3):
     for arm in ("full", "centred"):
         out = os.path.join(ROOT, f"runs/gap_lagsoft_{arm}_s{seed}.json")
         if os.path.exists(out):

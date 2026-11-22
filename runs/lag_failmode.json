@@ -26,6 +26,14 @@
    "grasp_losses": 58,
    "losses_on_table": 0.7758620689655172
   },
+  "full_s3": {
+   "success": 0.53,
+   "failed_after_grasp": 0.26,
+   "failed_no_grasp": 0.21,
+   "grasp_onsets": 114,
+   "grasp_losses": 61,
+   "losses_on_table": 0.7049180327868853
+  },
   "centred_s0": {
    "success": 0.69,
    "failed_after_grasp": 0.18,
@@ -49,6 +57,14 @@
    "grasp_onsets": 159,
    "grasp_losses": 84,
    "losses_on_table": 0.5952380952380952
+  },
+  "centred_s3": {
+   "success": 0.89,
+   "failed_after_grasp": 0.07,
+   "failed_no_grasp": 0.04,
+   "grasp_onsets": 149,
+   "grasp_losses": 59,
+   "losses_on_table": 0.559322033898305
   }
  }
 }

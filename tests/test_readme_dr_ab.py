@@ -7,6 +7,7 @@ import dr_ab
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 README = open(os.path.join(ROOT, "docs", "DETAILS.md")).read()
 
+SEEDS = (0, 1, 2, 3)   # every A/B analysis covers the same training seeds
 
 def test_dr_ab_table_matches_runs():
     s = dr_ab.summarise(dr_ab.load(os.path.join(ROOT, "runs")))
@@ -41,7 +42,7 @@ def test_other_cells_sentence_matches_runs():
 def test_lag_servo_sentence_matches_runs():
     s = dr_ab.summarise(dr_ab.load(os.path.join(ROOT, "runs"), prefixes=("gap_lagsoft",)))
     r = s["cells"]["lagsoft"]
-    assert s["train_seeds"] == [0, 1, 2] and all(d > 0 for d in r["diff"])
+    assert s["train_seeds"] == list(SEEDS) and all(d > 0 for d in r["diff"])
     text = " ".join(README.split())
     assert "arm A does not recover ({:.3f} ± {:.3f})".format(*r["full_mean_sd"]) in text
     assert "B stays ahead in every seed ({:+.3f} ± {:.3f})".format(*r["diff_mean_sd"]) in text
@@ -51,7 +52,7 @@ def test_lag_servo_sentence_matches_runs():
 
 def test_action_stats_sentence_matches_runs():
     d = json.load(open(os.path.join(ROOT, "runs", "action_stats.json")))["policies"]
-    assert len(d) == 12      # 2 physics x 2 arms x 3 seeds
+    assert len(d) == 4 * len(SEEDS)      # 2 physics x 2 arms
     mag = [v["mean_abs_action"] for v in d.values()]
     sat = [v["saturated_share"] for v in d.values()]
     text = " ".join(README.split())
@@ -65,15 +66,15 @@ def test_action_stats_sentence_matches_runs():
 
 def test_lag_failmode_sentence_matches_runs():
     d = json.load(open(os.path.join(ROOT, "runs", "lag_failmode.json")))["policies"]
-    assert len(d) == 6
+    assert len(d) == 2 * len(SEEDS)
     text = " ".join(README.split())
 
     def rng(arm, key):
-        v = [d[f"{arm}_s{s}"][key] for s in (0, 1, 2)]
+        v = [d[f"{arm}_s{s}"][key] for s in SEEDS]
         return f"{100 * min(v):.0f}–{100 * max(v):.0f} %"
     assert (f"still fail are {rng('full', 'failed_after_grasp')} for A and "
             f"{rng('centred', 'failed_after_grasp')} for B, lower for B in every seed") in text
-    assert all(d[f"centred_s{s}"]["failed_after_grasp"] < d[f"full_s{s}"]["failed_after_grasp"] for s in (0, 1, 2))
+    assert all(d[f"centred_s{s}"]["failed_after_grasp"] < d[f"full_s{s}"]["failed_after_grasp"] for s in SEEDS)
     assert (f"no grasp at all are {rng('full', 'failed_no_grasp')} for A and "
             f"{rng('centred', 'failed_no_grasp')} for B") in text
 
@@ -83,11 +84,15 @@ def test_grasp_contact_sentence_matches_runs():
     text = " ".join(README.split())
 
     def rng(arm, key, pct=False):
-        v = [d[f"{arm}_s{s}"][key] for s in (0, 1, 2)]
+        v = [d[f"{arm}_s{s}"][key] for s in SEEDS]
         return f"{100 * min(v):.0f}–{100 * max(v):.0f}" if pct else f"{min(v)}–{max(v)}"
     assert (f"({rng('centred', 'grasp_onsets')} onsets per 100 episodes against "
             f"{rng('full', 'grasp_onsets')} for A, more in every seed)") in text
-    assert all(d[f"centred_s{s}"]["grasp_onsets"] > d[f"full_s{s}"]["grasp_onsets"] for s in (0, 1, 2))
-    assert f"({rng('centred', 'grasp_losses')} against {rng('full', 'grasp_losses')})" in text
+    assert all(d[f"centred_s{s}"]["grasp_onsets"] > d[f"full_s{s}"]["grasp_onsets"] for s in SEEDS)
+    more = [s for s in SEEDS if d[f"centred_s{s}"]["grasp_losses"] > d[f"full_s{s}"]["grasp_losses"]]
+    (k,) = [s for s in SEEDS if s not in more]
+    assert len(more) == 3 and (f"loses more of them in three of four seeds ({rng('centred', 'grasp_losses')} against "
+                               f"{rng('full', 'grasp_losses')}; seed {k}: {d[f'centred_s{k}']['grasp_losses']} against "
+                               f"{d[f'full_s{k}']['grasp_losses']})") in text
     lo = min(v["losses_on_table"] for v in d.values()); hi = max(v["losses_on_table"] for v in d.values())
     assert f"{100 * lo:.0f}–{100 * hi:.0f} % of losses with the cube still on the table" in text

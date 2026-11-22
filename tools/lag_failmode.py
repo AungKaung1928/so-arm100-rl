@@ -1,6 +1,6 @@
 """Where do the DR A/B policies fail under 3-step lag: before any grasp, or after grasping and losing the cube?
 
-Each of the six A/B policies, 100 `laggy` lift episodes (eval seed 0). Per episode, from the env's per-step
+Each of the eight A/B policies, 100 `laggy` lift episodes (eval seed 0). Per episode, from the env's per-step
 `grasped` flag: success; failed after the cube was grasped at some step; failed without any grasp. Also counts
 grasp onsets and losses (flag on -> off) over all episodes, and the share of losses with the cube on the table
 (less than 1 cm above its start height).
@@ -20,7 +20,7 @@ from so_arm100_rl.ppo import FrozenPolicy        # noqa: E402
 EPISODES = 100
 out = {}
 for arm in ("full", "centred"):
-    for seed in (0, 1, 2):
+    for seed in (0, 1, 2, 3):
         policy = FrozenPolicy.from_checkpoint(os.path.join(ROOT, f"runs/ab_{arm}_s{seed}/policy.pt"))
         env = ArmEnv(TaskSpec.parse("lift:red"), seed=0, physics="laggy", obs_mode="state", action_mode="delta")
         n = {"success": 0, "failed_after_grasp": 0, "failed_no_grasp": 0}

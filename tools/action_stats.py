@@ -1,6 +1,6 @@
 """Do the DR A/B policies differ in how hard they drive the arm? (candidate mechanism for B's lag tolerance)
 
-For each of the six A/B policies, on `nominal` and on `laggy`: 50 lift episodes (eval seed 0, same episode seeds for every policy),
+For each of the eight A/B policies, on `nominal` and on `laggy`: 50 lift episodes (eval seed 0, same episode seeds for every policy),
 mean |action| per step, mean |a_t - a_{t-1}| per step (jerkiness), and the share of action components at the
 +-1 clip. Actions are joint-target deltas (action_mode delta), so |action| is the commanded speed.
 
@@ -22,7 +22,7 @@ EPISODES = 50
 out = {}
 for phys in ("nominal", "laggy"):
     for arm in ("full", "centred"):
-        for seed in (0, 1, 2):
+        for seed in (0, 1, 2, 3):
             policy = FrozenPolicy.from_checkpoint(os.path.join(ROOT, f"runs/ab_{arm}_s{seed}/policy.pt"))
             env = ArmEnv(TaskSpec.parse("lift:red"), seed=0, physics=phys, obs_mode="state", action_mode="delta")
             mag, jerk, sat = [], [], []
