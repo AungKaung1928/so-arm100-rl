@@ -12,7 +12,12 @@ RUN pip install --no-cache-dir torch==2.11.0 --index-url https://download.pytorc
  && pip install --no-cache-dir -r requirements.txt
 COPY so_arm100_rl ./so_arm100_rl
 COPY tests ./tests
-COPY train.py eval_gap.py compare_gap.py export_onnx.py verify.sh ./
+COPY train.py eval_gap.py compare_gap.py export_onnx.py dr_ab.py verify.sh ./
 RUN pip install --no-cache-dir -e .
+
+# README/DETAILS <-> runs/*.json tests read these.
+COPY docs ./docs
+COPY runs ./runs
+COPY tools ./tools
 
 CMD ["python", "-m", "pytest", "tests"]

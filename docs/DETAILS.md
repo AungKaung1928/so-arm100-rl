@@ -137,7 +137,7 @@ in two seeds of three (seed 0: -0.002), and `weak` is a tie despite being in C's
 | training throughput, 8 workers | env-steps/s | 3,043 (chunk 1), 2,425 (chunk 2) | chunk 2 on a shared host; DR fine-tune 2,546 |
 | one 20 M-step run | wall-clock | 2 h 10 min | 59 + 70 min |
 | ONNX export (DR fine-tune) | 1-thread latency p50 / p99 | 0.008 / 0.015 ms | n = 2000; max \|torch − onnx\| 2.1e-6; 298 kB / 73,990 parameters |
-| Docker image | tests inside | 16 passed | 1.84 GB, built 2026-09-23 |
+| Docker image | tests inside | 54 passed, 1 skipped | 1.84 GB, built 2026-11-23 |
 
 ### Key points
 
@@ -447,7 +447,7 @@ pip install -e .
 ```
 
 `docker build -t so-arm100-rl . && docker run --rm so-arm100-rl` runs the
-tests in a clean image (no GL; nothing here renders). Image built on 2026-09-23 and its default command passed inside it (16 tests passed), image size 1.84 GB.
+tests in a clean image (no GL; nothing here renders). Image built on 2026-11-23 and its default command passed inside it (54 tests passed, 1 skipped), image size 1.84 GB.
 
 <details><summary><b>Limits, stated</b></summary>
 
